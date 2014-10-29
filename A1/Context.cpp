@@ -21,7 +21,7 @@
 #include "Scenegraph.hpp"
 #include "Context.hpp"
 
-// a bunch of variables
+// a bunch of variables ---
 
 // window dimensions
 int Context::width, Context::height;
