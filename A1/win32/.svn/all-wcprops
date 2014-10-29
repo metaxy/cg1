@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32
+END
+glut.h
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32/glut.h
+END
+glut32.lib
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32/glut32.lib
+END
+cg1_ex1.exe
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32/cg1_ex1.exe
+END
+glut.def
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32/glut.def
+END
+cg1_ex1_extra.exe
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32/cg1_ex1_extra.exe
+END
+glut32.dll
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32/glut32.dll
+END
+README-win32.txt
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex1/skeleton/win32/README-win32.txt
+END
