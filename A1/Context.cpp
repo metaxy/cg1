@@ -62,7 +62,7 @@ void Context::config(){
   // camera setup
   fov= 40.0;
   cameraZ= (height/2) / tan(fov/180.0);
-  nearPlane= cameraZ/10.0;
+  nearPlane = cameraZ / 10.0;
   farPlane= cameraZ*10.0;
 }
 
@@ -151,10 +151,33 @@ void Context::display(void){
 
   // 
   if(leftButton) {
-	  glLineWidth(25.f);
+	  // save enable bit for lighting
+	  // and current bit for color
+	  glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
+
+	  // draw coordinate axes at center of rotation
+	  // note: lighting disabled for axis drawing
+	  glDisable(GL_LIGHTING);
+	  //glDisable(GL_DEPTH_TEST);
+	  /*
+	  glLineWidth(60.f);
 	  glBegin(GL_LINES);
 
+	  glVertex3f(0, 0, cameraZ / 10.0);
+	  glVertex3f(0, 100, cameraZ / 10.0 + 150);
 	  glEnd();
+	  glLineWidth(1.f);*/
+
+	  glPushMatrix();
+	  glTranslatef(mouseX - width/2.f, -mouseY + height/2.f, cameraZ/10.f);
+	  glutWireCube(10);
+	  glPopMatrix();
+	  
+	  
+
+	 // glEnable(GL_DEPTH_TEST);
+
+	  glPopAttrib();
   }
 
   // display back buffer
@@ -319,11 +342,13 @@ void Context::mousePressed(int button, int state, int x, int y){
   if (button == GLUT_LEFT) {
     if (state == GLUT_UP) {
       leftButton= false;
+	  display();
     }
     else if (state == GLUT_DOWN) {
       leftButton= true;  
       mouseX = x;
       mouseY = y;
+	  display();
     }
   }
 }
