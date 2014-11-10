@@ -81,6 +81,10 @@ public:
   // of an individual node
   void drawJoint();
 
+  // draw bounding sphere
+  // of the node (centered at the joint)
+  void drawBoundingSphere();
+
   // increment / decrement rotation
   void rotate(float x, float y, float z);
 

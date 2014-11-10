@@ -19,6 +19,7 @@ tu berlin
 
 #include <iostream> 
 #include "Node.hpp"
+#include "glm\glm\glm.hpp"
 
 // without this line, 
 // printline debugging won't work
@@ -57,6 +58,50 @@ Node::Node(float x, float y, float z,
 	this->child = NULL;
 	this->previous = NULL;
 	this->next = NULL;
+
+	glm::vec3 p1(-this->length*0.5f,
+				 this->height*0.5f,
+				 this->width*0.5f);
+	glm::vec3 p2(this->length*0.5f,
+				 this->height*0.5f,
+				 this->width*0.5f);
+	glm::vec3 p3(-this->length*0.5f,
+				 -this->height*0.5f,
+				 this->width*0.5f);
+	glm::vec3 p4(this->length*0.5f,
+				 -this->height*0.5f,
+				 this->width*0.5f);
+	glm::vec3 p5(-this->length*0.5f,
+				 this->height*0.5f,
+				 -this->width*0.5f);
+	glm::vec3 p6(this->length*0.5f,
+				 this->height*0.5f,
+				 -this->width*0.5f);
+	glm::vec3 p7(-this->length*0.5f,
+				 -this->height*0.5f,
+				 -this->width*0.5f);
+	glm::vec3 p8(this->length*0.5f,
+				 -this->height*0.5f,
+				 -this->width*0.5f);
+
+	glm::vec3 joint(this->jointx,
+					this->jointy,
+					this->jointz);
+
+	this->trackballRadius =
+		glm::max(
+		glm::max(
+		glm::max(
+		glm::max(
+		glm::max(
+		glm::max(
+		glm::max(glm::distance(joint, p1), glm::distance(joint, p2)), 
+		glm::distance(joint, p3)), 
+		glm::distance(joint, p4)), 
+		glm::distance(joint, p5)), 
+		glm::distance(joint, p6)), 
+		glm::distance(joint, p7)), 
+		glm::distance(joint, p8));
 }
 
 // destructor
@@ -120,6 +165,11 @@ void Node::render() {
 
 	// draw Joint (rotation center)
 	drawJoint();
+
+	// Draw the bounding sphere if the limb is selected
+	if(this->selected) {
+		drawBoundingSphere();
+	}
 
 	// translate center of rotation into limb's origin
 	// XXX
@@ -197,6 +247,21 @@ void Node::drawJoint() {
 	// END XXX
 
 	glEnd();
+	glPopAttrib();
+}
+
+void Node::drawBoundingSphere() {
+	// save enable bit for lighting
+	// and current bit for color
+	glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
+
+	// draw coordinate axes at center of rotation
+	// note: lighting disabled for axis drawing
+	glDisable(GL_LIGHTING);
+
+	glColor3f(1.f, 1.0f, 1.0f);
+	glutWireSphere(trackballRadius, 20.f, 20.f);
+
 	glPopAttrib();
 }
 

@@ -149,56 +149,56 @@ void Context::display(void){
   // draw the scenegraph
   sceneGraph->traverse();
 
-  // 
-  if(leftButton) {
-	  // save enable bit for lighting
-	  // and current bit for color
-	  glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
+  //// 
+  //if(leftButton) {
+	 // // save enable bit for lighting
+	 // // and current bit for color
+	 // glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
 
-	  // draw coordinate axes at center of rotation
-	  // note: lighting disabled for axis drawing
-	  glDisable(GL_LIGHTING);
-	  glDisable(GL_DEPTH_TEST);
-	  /*
-	  glLineWidth(60.f);
-	  glBegin(GL_LINES);
+	 // // draw coordinate axes at center of rotation
+	 // // note: lighting disabled for axis drawing
+	 // glDisable(GL_LIGHTING);
+	 // glDisable(GL_DEPTH_TEST);
+	 // /*
+	 // glLineWidth(60.f);
+	 // glBegin(GL_LINES);
 
-	  glVertex3f(0, 0, cameraZ / 10.0);
-	  glVertex3f(0, 100, cameraZ / 10.0 + 150);
-	  glEnd();
-	  glLineWidth(1.f);*/
+	 // glVertex3f(0, 0, cameraZ / 10.0);
+	 // glVertex3f(0, 100, cameraZ / 10.0 + 150);
+	 // glEnd();
+	 // glLineWidth(1.f);*/
 
-	  float nearPlaneZ = cameraZ - nearPlane;
-	  float unitMouseX = (mouseX - width / 2.f) / (width / 2.f);
-	  float unitMouseY = (-mouseY + height / 2.f) / (height / 2.f);
+	 // float nearPlaneZ = cameraZ - nearPlane;
+	 // float unitMouseX = (mouseX - width / 2.f) / (width / 2.f);
+	 // float unitMouseY = (-mouseY + height / 2.f) / (height / 2.f);
 
-	  double PI = 3.14159265359;
-	  float angleX = unitMouseX * ((width * (fov * 0.5))/static_cast<float>(height));
-	  float angleY = unitMouseY * (fov * 0.5);
-	  float yaw = angleX * PI / 180.;
-	  float pitch = angleY * PI / 180.;
-	  
-	  float rayBaseX = tan(yaw) * nearPlane;
-	  float rayBaseY = tan(pitch) * nearPlane;
-	  float rayBaseZ = nearPlaneZ;
+	 // double PI = 3.14159265359;
+	 // float angleX = unitMouseX * ((width * (fov * 0.5))/static_cast<float>(height));
+	 // float angleY = unitMouseY * (fov * 0.5);
+	 // float yaw = angleX * PI / 180.;
+	 // float pitch = angleY * PI / 180.;
+	 // 
+	 // float rayBaseX = tan(yaw) * nearPlane;
+	 // float rayBaseY = tan(pitch) * nearPlane;
+	 // float rayBaseZ = nearPlaneZ;
 
-	  float directionX = rayBaseX - 0.f;
-	  float directionY = rayBaseY - 0.f;
-	  float directionZ = rayBaseX - nearPlaneZ;
-	  float mag = sqrt(directionX*directionX + directionY*directionY + directionZ*directionZ);
-	  directionX /= mag;
-	  directionY /= mag;
-	  directionZ /= mag;
+	 // float directionX = rayBaseX - 0.f;
+	 // float directionY = rayBaseY - 0.f;
+	 // float directionZ = rayBaseX - nearPlaneZ;
+	 // float mag = sqrt(directionX*directionX + directionY*directionY + directionZ*directionZ);
+	 // directionX /= mag;
+	 // directionY /= mag;
+	 // directionZ /= mag;
 
-	  glPushMatrix();
-	  glTranslatef(rayBaseX, rayBaseY, rayBaseZ);
-	  glutWireSphere(2, 15, 15);
-	  glPopMatrix();
+	 // glPushMatrix();
+	 // glTranslatef(rayBaseX, rayBaseY, rayBaseZ);
+	 // glutWireSphere(2, 15, 15);
+	 // glPopMatrix();
 
-	  glEnable(GL_DEPTH_TEST);
+	 // glEnable(GL_DEPTH_TEST);
 
-	  glPopAttrib();
-  }
+	 // glPopAttrib();
+  //}
 
   // display back buffer
   glutSwapBuffers();
