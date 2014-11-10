@@ -117,6 +117,8 @@ public:
   float roty;     	// of node relative
   float rotz;	    	// to parent node rotation
 
+  float trackballRadius; // Radius of the bounding sphere
+
   // is node selected?
   bool selected;
   
