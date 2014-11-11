@@ -37,6 +37,7 @@ class SceneGraph{
 
   // increment / decrement rotation of selected node
   void rotate(float x, float y, float z);
+  void rotate(float x, float y, float prevX, float prevY);
 
   // reset all rotations
   void reset();

@@ -297,3 +297,9 @@ void Node::deselect() {
 	selected = false;
 }
 
+void Node::reset() {
+	rotx = 0;
+	roty = 0;
+	rotz = 0;
+}
+
