@@ -48,6 +48,11 @@ void SceneGraph::reset() {
 	reset(root);
 }
 
+// pick the node that has the color id
+void SceneGraph::pick(GLint r, GLint g, GLint b) {
+	pick(root, r, g, b);
+}
+
 // navigation in tree
 // (needed for node selection)
 void SceneGraph::up() {
@@ -151,4 +156,31 @@ void SceneGraph::reset(Node* node) {
 
 	reset(node->getNext());
 	// END XXX
+}
+
+// pick the right node by color
+bool SceneGraph::pick(Node* node, GLint r, GLint g, GLint b) {
+	if(node == NULL)
+		return false;
+	
+	// Recalculate the id from the color
+	int id = r - 100;
+
+	if(node->id == id) {
+		// Deselect the old node and select the new node
+		selected->deselect();
+		node->select();
+		this->selected = node;
+	} else {
+		// Check if any of the children is picked
+		if(pick(node->getChild(), r, g, b))
+			return true;
+
+		// Check if any of the siblings is picked
+		if(pick(node->getNext(), r, g, b))
+			return true;
+	}
+
+	// No node in this part of the graph was clicked
+	return false;
 }

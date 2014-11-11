@@ -27,7 +27,7 @@ using namespace std;
    ------------------------------------------------ */
 
 namespace Context{
-	enum RotationMode {UNDEFINED, EULER, TRACKBALL};
+	enum RotationMode { UNDEFINED, EULER, TRACKBALL };
 
   // window dimensions
   extern int width, height;

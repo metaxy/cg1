@@ -34,7 +34,8 @@ using namespace std;
 Node::Node(float x, float y, float z,
 		   float length, float height, float width,
 		   float jointx, float jointy, float jointz,
-		   float rotx, float roty, float rotz) {
+		   float rotx, float roty, float rotz,
+		   int id) {
 
 	this->selected = false;
 
@@ -58,6 +59,8 @@ Node::Node(float x, float y, float z,
 	this->child = NULL;
 	this->previous = NULL;
 	this->next = NULL;
+
+	this->id = id;
 
 	glm::vec3 p1(-this->length*0.5f,
 				 this->height*0.5f,
@@ -95,12 +98,12 @@ Node::Node(float x, float y, float z,
 		glm::max(
 		glm::max(
 		glm::max(
-		glm::max(glm::distance(joint, p1), glm::distance(joint, p2)), 
-		glm::distance(joint, p3)), 
-		glm::distance(joint, p4)), 
-		glm::distance(joint, p5)), 
-		glm::distance(joint, p6)), 
-		glm::distance(joint, p7)), 
+		glm::max(glm::distance(joint, p1), glm::distance(joint, p2)),
+		glm::distance(joint, p3)),
+		glm::distance(joint, p4)),
+		glm::distance(joint, p5)),
+		glm::distance(joint, p6)),
+		glm::distance(joint, p7)),
 		glm::distance(joint, p8));
 }
 
@@ -190,7 +193,19 @@ void Node::draw() {
 	glPushAttrib(GL_LIGHTING_BIT);
 
 	GLfloat red[] = {1.0, 0, 0};
-	if(selected) glLightModelfv(GL_LIGHT_MODEL_AMBIENT, red);
+	GLfloat color[] = {
+		(id + 100) / 127.,
+		(id + 100) / 127.,
+		(id + 100) / 127.
+	};
+	if(selected) {
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, red);
+	} else {
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, color);
+	}
+
+
+
 
 	glPushMatrix();
 

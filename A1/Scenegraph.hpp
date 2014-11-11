@@ -41,6 +41,9 @@ class SceneGraph{
 
   // reset all rotations
   void reset();
+  
+  // pick a node by color
+  void pick(GLint r, GLint g, GLint b);
 
  private:
 
@@ -58,4 +61,7 @@ class SceneGraph{
 
   // destroy all nodes
   void clear(Node *node);
+
+  // pick the right node by color
+  bool pick(Node* node, GLint r, GLint g, GLint b);
 };

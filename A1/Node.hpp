@@ -55,7 +55,7 @@ public:
   Node(float x, float y, float z, 
        float length, float height, float width,
        float jointx, float jointy, float jointz,
-       float rotx, float roty, float rotz);
+       float rotx, float roty, float rotz, int id);
 
   // sets the parent of this node
   void setParent(Node* parent);
@@ -120,6 +120,8 @@ public:
   float rotx;           // x,y,z rotation (in degrees)
   float roty;     	// of node relative
   float rotz;	    	// to parent node rotation
+
+  int id;
 
   float trackballRadius; // Radius of the bounding sphere
 
