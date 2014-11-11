@@ -39,6 +39,8 @@ GLfloat Context::nearPlane, Context::farPlane;
 bool Context::leftButton;
 // mouse position in previous frame
 int Context::mouseX, Context::mouseY;
+// current rotation mode
+Context::RotationMode Context::rotMode;
 
 // set parameters to your own liking 
 // (or leave them as they are)
@@ -109,6 +111,9 @@ void Context::init(int argc, char **argv){
   gluPerspective(fov, width/height, nearPlane, farPlane);
 
   registerCallbacks();
+
+  // set the rotation mode
+  rotMode = RotationMode::EULER;
 
   // some output to console
   cout << "--------------------------------------------\n";
@@ -267,11 +272,7 @@ void Context::keyPressed(unsigned char key, int x, int y){
   case 'r':
     sceneGraph->reset();
     display();
-    break;
-  case 'R':
-    sceneGraph->reset();
-    display();
-    break;
+	break;
 
     // END XXX
 
@@ -320,23 +321,28 @@ void Context::specialKeys(int key, int x, int y){
 void Context::menu(int id){
 
   switch (id) {
-  case 1: 
+  case 4: 
     delete sceneGraph;
     exit(0);
   
     // XXX: reset rotations
 
     // INSERT YOUR CODE HERE
-  case 2:
+  case 1:
   sceneGraph->reset();
+  display();
   break;
 
     // END XXX
     
     // XXX: add more options (optional)
   
-    // INSERT YOUR CODE HERE
-    
+  case 2:
+  rotMode = RotationMode::EULER;
+  break;
+  case 3:
+  rotMode = RotationMode::TRACKBALL;
+  break;
     // END XXX
 
   default:
@@ -349,7 +355,13 @@ void Context::mouseMoved(int x, int y){
 
   // rotate selected node when left mouse button is pressed
   if (leftButton) {
-    sceneGraph->rotate((float) (y-mouseY), (float) (x-mouseX), 0);
+	  if(rotMode == RotationMode::EULER) {
+		  sceneGraph->rotate((float) (y - mouseY), (float) (x - mouseX), 0);
+	  } else if(rotMode == RotationMode::TRACKBALL) {
+
+	  } else {
+	  }
+    
     mouseX = x;
     mouseY = y;
     display();
@@ -389,18 +401,21 @@ void Context::registerCallbacks(void){
   // XXX: add reset option
   
   // INSERT YOUR CODE HERE
-  glutAddMenuEntry("reset", 1);
+  glutAddMenuEntry("Reset", 1);
 
   // END XXX
 
-  glutAddMenuEntry("quit", 2);
+  
 
   // XXX: add more options (optional)
   
-  // INSERT YOUR CODE HERE
+  glutAddMenuEntry("Euler", 2);
+  glutAddMenuEntry("Trackball", 3);
   
   // END XXX
   
+  glutAddMenuEntry("Quit", 4);
+
   glutAttachMenu(GLUT_RIGHT_BUTTON);
   return;
 }

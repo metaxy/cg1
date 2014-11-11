@@ -27,6 +27,7 @@ using namespace std;
    ------------------------------------------------ */
 
 namespace Context{
+	enum RotationMode {UNDEFINED, EULER, TRACKBALL};
 
   // window dimensions
   extern int width, height;
@@ -54,6 +55,8 @@ namespace Context{
   extern bool leftButton;
   // mouse position in previous frame
   extern int mouseX, mouseY;
+  // rotation mode
+  extern RotationMode rotMode;
 
   // initialize above variables
   void config(void);
