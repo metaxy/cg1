@@ -1,0 +1,167 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc
+END
+matrix_transform.inl
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/matrix_transform.inl
+END
+matrix_inverse.inl
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/matrix_inverse.inl
+END
+ulp.inl
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/ulp.inl
+END
+type_precision.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/type_precision.hpp
+END
+matrix_transform.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/matrix_transform.hpp
+END
+matrix_inverse.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/matrix_inverse.hpp
+END
+ulp.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/ulp.hpp
+END
+type_ptr.inl
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/type_ptr.inl
+END
+epsilon.inl
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/epsilon.inl
+END
+type_ptr.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/type_ptr.hpp
+END
+packing.inl
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/packing.inl
+END
+constants.inl
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/constants.inl
+END
+noise.inl
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/noise.inl
+END
+epsilon.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/epsilon.hpp
+END
+random.inl
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/random.inl
+END
+packing.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/packing.hpp
+END
+constants.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/constants.hpp
+END
+noise.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/noise.hpp
+END
+reciprocal.inl
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/reciprocal.inl
+END
+matrix_access.inl
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/matrix_access.inl
+END
+quaternion.inl
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/quaternion.inl
+END
+random.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/random.hpp
+END
+matrix_integer.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/matrix_integer.hpp
+END
+reciprocal.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/reciprocal.hpp
+END
+matrix_access.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/matrix_access.hpp
+END
+quaternion.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/quaternion.hpp
+END
+type_precision.inl
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/gtc/type_precision.inl
+END

@@ -1,0 +1,149 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm
+END
+integer.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/integer.hpp
+END
+vec2.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/vec2.hpp
+END
+ext.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/ext.hpp
+END
+vec3.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/vec3.hpp
+END
+vec4.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/vec4.hpp
+END
+matrix.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/matrix.hpp
+END
+packing.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/packing.hpp
+END
+vector_relational.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/vector_relational.hpp
+END
+mat2x2.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat2x2.hpp
+END
+mat3x2.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat3x2.hpp
+END
+mat2x3.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat2x3.hpp
+END
+geometric.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/geometric.hpp
+END
+mat4x2.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat4x2.hpp
+END
+mat3x3.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat3x3.hpp
+END
+mat2x4.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat2x4.hpp
+END
+glm.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/glm.hpp
+END
+mat3x4.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat3x4.hpp
+END
+fwd.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/fwd.hpp
+END
+mat4x3.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat4x3.hpp
+END
+mat4x4.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/mat4x4.hpp
+END
+trigonometric.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/trigonometric.hpp
+END
+exponential.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/exponential.hpp
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/CMakeLists.txt
+END
+common.hpp
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/105/trunk/ex/cg1_ex2/skeleton/glm/glm/common.hpp
+END
