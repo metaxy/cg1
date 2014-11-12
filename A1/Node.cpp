@@ -20,6 +20,7 @@ tu berlin
 #include <iostream> 
 #include "Node.hpp"
 #include "glm\glm\glm.hpp"
+#include "glm\glm\gtx\transform.hpp"
 
 // without this line, 
 // printline debugging won't work
@@ -61,6 +62,8 @@ Node::Node(float x, float y, float z,
 	this->next = NULL;
 
 	this->id = id;
+	this->rotMode = RotationMode::EULER;
+	this->rotMatrix = glm::mat4x4();
 
 	glm::vec3 p1(-this->length*0.5f,
 				 this->height*0.5f,
@@ -134,7 +137,6 @@ void Node::setParent(Node* parent) {
 // and call draw() methods
 // XXX: NEEDS TO BE IMPLEMENTED
 void Node::render() {
-
 	// note the order of the operations:
 	// the transformations are applied in "reverse" order
 	// of glRotate/glTranslate calls
@@ -160,9 +162,16 @@ void Node::render() {
 	// XXX
 
 	// INSERT YOUR CODE HERE
-	glRotatef(rotx, 1.f, 0.f, 0.f);
-	glRotatef(roty, 0.f, 1.f, 0.f);
-	glRotatef(rotz, 0.f, 0.f, 1.f);
+	if(rotMode == RotationMode::EULER) {
+		glRotatef(rotx, 1.f, 0.f, 0.f);
+		glRotatef(roty, 0.f, 1.f, 0.f);
+		glRotatef(rotz, 0.f, 0.f, 1.f);
+	} else {
+		glm::quat rotQuat(rotMatrix);
+		glRotatef(glm::angle(rotQuat),
+				  glm::axis(rotQuat).x, glm::axis(rotQuat).y, glm::axis(rotQuat).z);
+	}
+
 
 	// END XXX
 
@@ -316,5 +325,11 @@ void Node::reset() {
 	rotx = 0;
 	roty = 0;
 	rotz = 0;
+
+	rotMatrix = glm::mat4x4();
+}
+
+void Node::setRotationMode(RotationMode rotMode) {
+	this->rotMode = rotMode;
 }
 

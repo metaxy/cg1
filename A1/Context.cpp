@@ -40,7 +40,7 @@ bool Context::leftButton;
 // mouse position in previous frame
 int Context::mouseX, Context::mouseY;
 // current rotation mode
-Context::RotationMode Context::rotMode;
+RotationMode Context::rotMode;
 
 // set parameters to your own liking 
 // (or leave them as they are)
@@ -287,9 +287,13 @@ void Context::menu(int id){
   
   case 2:
   rotMode = RotationMode::EULER;
+  sceneGraph->setRotationMode(rotMode);
+  display();
   break;
   case 3:
   rotMode = RotationMode::TRACKBALL;
+  sceneGraph->setRotationMode(rotMode);
+  display();
   break;
     // END XXX
 
@@ -306,7 +310,13 @@ void Context::mouseMoved(int x, int y){
 	  if(rotMode == RotationMode::EULER) {
 		  sceneGraph->rotate((float) (y - mouseY), (float) (x - mouseX), 0);
 	  } else if(rotMode == RotationMode::TRACKBALL) {
-
+		  // switch to opengl modelview matrix
+		  glMatrixMode(GL_MODELVIEW);
+		  glLoadIdentity();
+		  camera();
+		  sceneGraph->rotate(x - width*0.5f, height*0.5f - y,
+							 mouseX - width*0.5f, height*0.5f - mouseY,
+							 width, height);
 	  } else {
 	  }
     
@@ -338,15 +348,10 @@ void Context::mousePressed(int button, int state, int x, int y){
 	  sceneGraph->traverse();
 	  glEnable(GL_LIGHT0);
 
-	  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	  //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	  unsigned char pixel[4];
 	  glReadPixels(x, height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
-	  std::cout << "(" << (int) pixel[0] 
-		  << ", " << (int) pixel[1] 
-		  << ", " << (int) pixel[2]
-		  << ", " << (int) pixel[3] 
-		  << ")" << std::endl;
 	  
 	  sceneGraph->pick(pixel[0], pixel[1], pixel[2]);
 

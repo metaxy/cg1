@@ -56,6 +56,9 @@
     <ClInclude Include="RobotLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Modes.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Robot.lua">

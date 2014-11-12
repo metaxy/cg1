@@ -37,13 +37,16 @@ class SceneGraph{
 
   // increment / decrement rotation of selected node
   void rotate(float x, float y, float z);
-  void rotate(float x, float y, float prevX, float prevY);
+  void rotate(float x, float y, float prevX, float prevY, float width, float height);
 
   // reset all rotations
   void reset();
   
   // pick a node by color
   void pick(GLint r, GLint g, GLint b);
+
+  // set the rotation mode
+  void setRotationMode(RotationMode rotMode);
 
  private:
 
@@ -62,6 +65,12 @@ class SceneGraph{
   // destroy all nodes
   void clear(Node *node);
 
+  // rotate the selected node in the graph with its trackball
+  bool rotate(Node* node, float x, float y, float prevX, float prevY, float width, float height);
+
   // pick the right node by color
   bool pick(Node* node, GLint r, GLint g, GLint b);
+
+  // set the rotation mode of the current node at its siblings + children
+  void setRotationMode(Node* node, RotationMode rotMode);
 };

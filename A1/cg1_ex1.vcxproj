@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.hpp" />
+    <ClInclude Include="Modes.hpp" />
     <ClInclude Include="Node.hpp" />
     <ClInclude Include="Robot.hpp" />
     <ClInclude Include="RobotLoader.hpp" />

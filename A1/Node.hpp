@@ -42,8 +42,12 @@
 //           N    N   N
 //
 
-class Node{
+#include "glm\glm\glm.hpp"
+#include "glm\glm\gtx\quaternion.hpp"
 
+#include "Modes.hpp"
+
+class Node{
 public:
 
   // constructor
@@ -101,6 +105,9 @@ public:
   // reset rotation
   void reset();
 
+  // select the rotation mode
+  void setRotationMode(RotationMode rotMode);
+
   float x;              // x,y,z position of
   float y;             	// node center relative
   float z;	       	// to parent node center
@@ -123,7 +130,9 @@ public:
 
   int id;
 
+  RotationMode rotMode;
   float trackballRadius; // Radius of the bounding sphere
+  glm::mat4x4 rotMatrix;
 
   // is node selected?
   bool selected;

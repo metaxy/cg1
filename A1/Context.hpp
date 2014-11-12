@@ -26,9 +26,9 @@ using namespace std;
     registerCallbacks  - register all callbacks with GLUT
    ------------------------------------------------ */
 
-namespace Context{
-	enum RotationMode { UNDEFINED, EULER, TRACKBALL };
+#include "Modes.hpp"
 
+namespace Context{
   // window dimensions
   extern int width, height;
   // initial window position
