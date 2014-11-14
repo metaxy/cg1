@@ -179,7 +179,8 @@ void Node::render() {
 	drawJoint();
 
 	// Draw the bounding sphere if the limb is selected
-	if(this->selected) {
+	// and we are in trackball mode
+	if(this->selected && this->rotMode == RotationMode::TRACKBALL) {
 		drawBoundingSphere();
 	}
 
