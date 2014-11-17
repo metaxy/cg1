@@ -444,7 +444,7 @@ void Screen::menu(int value){
 char Clip::menuOptions[] = {0};
 string Clip::menuText[] = {"Test"};
 int Clip::numOptions = 1;
-float Clip::rotation = 0.f;
+float Clip::rotation = 200.f;
 bool Clip::lmbDown = false;
 float Clip::mouseX = 0.f;
 float Clip::mouseY = 0.f;
@@ -471,15 +471,24 @@ void Clip::display(void) {
 
 	// draw current model if toggled
 	glEnable(GL_LIGHTING);
-	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
+	glEnable(GL_NORMALIZE);
+	glLightfv(GL_LIGHT0, GL_POSITION, &glm::vec3(0.f, 0.f, -1.f)[0]);
 	glPushMatrix();
-	//gluPerspective(perspective[0].getValue(), perspective[1].getValue(),
-	//			   perspective[2].getValue(), perspective[3].getValue());
+	// a1 + r*b1 + s*c1
+	// a2 + r*b2 + s*c2
+	// a3 + r*b3 + s*c3
+	// 
+	GLdouble plane0[4] = {1.f, 0.f, 0.f, 0.f};
+	glClipPlane(GL_CLIP_PLANE0, plane0);
+	glEnable(GL_CLIP_PLANE0);
+
 	glMultMatrixf(&projection[0][0]);
-	glTranslatef(0.f, 0.f, -5.0f);
-	glRotatef(180.f, 0, 1, 0);
+	glMultMatrixf(&modelView[0][0]);
 	model.draw();
+
+	glDisable(GL_CLIP_PLANE0);
 	glPopMatrix();
+	glEnable(GL_NORMALIZE);
 	glDisable(GL_LIGHTING);
 	
 
@@ -488,10 +497,10 @@ void Clip::display(void) {
 	// apply inverse modelview transformation to axes and frustum
 	// this moves the camera position and frustum into world space
 	// coordinates
-	glMultMatrixf(&glm::inverse(modelView)[0][0]);
-
 	/* draw the axis and eye vector */
 	glPushMatrix();
+	glMultMatrixf(&projection[0][0]);
+	glMultMatrixf(&modelView[0][0]);
 	glColor3ub(0, 0, 255);
 	glBegin(GL_LINE_STRIP);
 	glVertex3f(0.0, 0.0, 0.0);
@@ -513,18 +522,16 @@ void Clip::display(void) {
 
 	// apply inverse projection transformation to unit-frustum
 	glMatrixMode(GL_MODELVIEW);
-	glMultMatrixf(&glm::inverse(projection)[0][0]);
 
 	/* draw the canonical viewing frustum */
 	// back clip plane
-	/*glColor3f(0.2, 0.2, 0.2);
+	glColor3f(0.2, 0.2, 0.2);
 	glBegin(GL_QUADS);
 	glVertex3i(1, 1, 1);
 	glVertex3i(-1, 1, 1);
 	glVertex3i(-1, -1, 1);
 	glVertex3i(1, -1, 1);
 	glEnd();
-	*/
 	// four corners of frustum
 	glColor3ub(128, 196, 128);
 	glBegin(GL_LINES);
@@ -566,7 +573,7 @@ void Clip::reshape(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	// this defines a camera matrix
-	glTranslatef(0.0, 0.0, -2.0);
+	glTranslatef(0.0, 0.0, -3.0);
 	glRotatef(Clip::rotation, 0.0, 1.0, 0.0);
 	glShadeModel(GL_SMOOTH);
 }
@@ -581,7 +588,7 @@ void Clip::mouseMoved(int x, int y) {
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		// this defines a camera matrix
-		glTranslatef(0.0, 0.0, -2.0);
+		glTranslatef(0.0, 0.0, -3.0);
 		glRotatef(Clip::rotation, 0.0, 1.0, 0.0);
 		glShadeModel(GL_SMOOTH);
 		Clip::display();
