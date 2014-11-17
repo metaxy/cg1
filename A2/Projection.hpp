@@ -55,7 +55,9 @@ namespace Screen{
 };
 
 // content of clip view sub-window
-namespace Clip{};
+namespace Clip{
+
+};
 
 // content of command view sub-window
 namespace Command{
