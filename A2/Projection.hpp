@@ -56,6 +56,21 @@ namespace Screen{
 
 // content of clip view sub-window
 namespace Clip{
+	extern char menuOptions[];
+	extern std::string menuText[];
+	extern int numOptions;
+
+	// display scene
+	void display(void);
+
+	// redisplay scene after window reshape
+	void reshape(int width, int height);
+
+	void mouseMoved(int x, int y);
+
+	void mousePressed(int btn, int state, int x, int y);
+	// mouse menu
+	void menu(int id);
 
 };
 
