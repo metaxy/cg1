@@ -1,0 +1,17 @@
+EXECUTABLE= cg1_ex2
+CC= g++
+CPPFLAGS= -O3 -Iglm/
+DEPS= glm/glm.hpp glm/gtc/matrix_transform.hpp Cell.hpp Context.hpp Window.hpp Projection.hpp ObjModel.hpp
+OBJ= Cell.o Context.o Window.o Projection.o ObjModel.o
+LIBS= -lGLU -lGL -lglut
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CPPFLAGS)
+
+$(EXECUTABLE): $(OBJ)
+	$(CC) -o $@ $^ $(CPPFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm -f *.o *~ $(EXECUTABLES)		

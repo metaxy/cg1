@@ -42,8 +42,12 @@
 //           N    N   N
 //
 
-class Node{
+#include "glm\glm\glm.hpp"
+#include "glm\glm\gtx\quaternion.hpp"
 
+#include "Modes.hpp"
+
+class Node{
 public:
 
   // constructor
@@ -55,7 +59,7 @@ public:
   Node(float x, float y, float z, 
        float length, float height, float width,
        float jointx, float jointy, float jointz,
-       float rotx, float roty, float rotz);
+       float rotx, float roty, float rotz, int id);
 
   // sets the parent of this node
   void setParent(Node* parent);
@@ -81,6 +85,10 @@ public:
   // of an individual node
   void drawJoint();
 
+  // draw bounding sphere
+  // of the node (centered at the joint)
+  void drawBoundingSphere();
+
   // increment / decrement rotation
   void rotate(float x, float y, float z);
 
@@ -96,6 +104,9 @@ public:
 
   // reset rotation
   void reset();
+
+  // select the rotation mode
+  void setRotationMode(RotationMode rotMode);
 
   float x;              // x,y,z position of
   float y;             	// node center relative
@@ -116,6 +127,12 @@ public:
   float rotx;           // x,y,z rotation (in degrees)
   float roty;     	// of node relative
   float rotz;	    	// to parent node rotation
+
+  int id;
+
+  RotationMode rotMode;
+  float trackballRadius; // Radius of the bounding sphere
+  glm::mat4x4 rotMatrix;
 
   // is node selected?
   bool selected;

@@ -21,7 +21,7 @@
 #include "Scenegraph.hpp"
 #include "Context.hpp"
 
-// a bunch of variables ---
+// a bunch of variables
 
 // window dimensions
 int Context::width, Context::height;
@@ -39,6 +39,8 @@ GLfloat Context::nearPlane, Context::farPlane;
 bool Context::leftButton;
 // mouse position in previous frame
 int Context::mouseX, Context::mouseY;
+// current rotation mode
+RotationMode Context::rotMode;
 
 // set parameters to your own liking 
 // (or leave them as they are)
@@ -62,8 +64,8 @@ void Context::config(){
   // camera setup
   fov= 40.0;
   cameraZ= (height/2) / tan(fov/180.0);
-  nearPlane= cameraZ/10.0;
-  farPlane= cameraZ*10.0;
+  nearPlane = cameraZ / 10.0;
+  farPlane= cameraZ * 10.0;
 }
 
 void Context::init(int argc, char **argv){
@@ -110,6 +112,9 @@ void Context::init(int argc, char **argv){
 
   registerCallbacks();
 
+  // set the rotation mode
+  rotMode = RotationMode::EULER;
+
   // some output to console
   cout << "--------------------------------------------\n";
   cout << " cg1_ex1 opengl robot scenegraph            \n";
@@ -136,7 +141,6 @@ void Context::camera(void){
 
 // display callback for GLUT
 void Context::display(void){
-  
   // clear color and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
@@ -148,14 +152,6 @@ void Context::display(void){
 
   // draw the scenegraph
   sceneGraph->traverse();
-
-  // 
-  if(leftButton) {
-	  glLineWidth(25.f);
-	  glBegin(GL_LINES);
-
-	  glEnd();
-  }
 
   // display back buffer
   glutSwapBuffers();
@@ -224,11 +220,7 @@ void Context::keyPressed(unsigned char key, int x, int y){
   case 'r':
     sceneGraph->reset();
     display();
-    break;
-  case 'R':
-    sceneGraph->reset();
-    display();
-    break;
+	break;
 
     // END XXX
 
@@ -277,23 +269,32 @@ void Context::specialKeys(int key, int x, int y){
 void Context::menu(int id){
 
   switch (id) {
-  case 1: 
+  case 4: 
     delete sceneGraph;
     exit(0);
   
     // XXX: reset rotations
 
     // INSERT YOUR CODE HERE
-  case 2:
+  case 1:
   sceneGraph->reset();
+  display();
   break;
 
     // END XXX
     
     // XXX: add more options (optional)
   
-    // INSERT YOUR CODE HERE
-    
+  case 2:
+  rotMode = RotationMode::EULER;
+  sceneGraph->setRotationMode(rotMode);
+  display();
+  break;
+  case 3:
+  rotMode = RotationMode::TRACKBALL;
+  sceneGraph->setRotationMode(rotMode);
+  display();
+  break;
     // END XXX
 
   default:
@@ -306,7 +307,19 @@ void Context::mouseMoved(int x, int y){
 
   // rotate selected node when left mouse button is pressed
   if (leftButton) {
-    sceneGraph->rotate((float) (y-mouseY), (float) (x-mouseX), 0);
+	  if(rotMode == RotationMode::EULER) {
+		  sceneGraph->rotate((float) (y - mouseY), (float) (x - mouseX), 0);
+	  } else if(rotMode == RotationMode::TRACKBALL) {
+		  // switch to opengl modelview matrix
+		  glMatrixMode(GL_MODELVIEW);
+		  glLoadIdentity();
+		  camera();
+		  sceneGraph->rotate(x - width*0.5f, height*0.5f - y,
+							 mouseX - width*0.5f, height*0.5f - mouseY,
+							 width, height);
+	  } else {
+	  }
+    
     mouseX = x;
     mouseY = y;
     display();
@@ -319,11 +332,31 @@ void Context::mousePressed(int button, int state, int x, int y){
   if (button == GLUT_LEFT) {
     if (state == GLUT_UP) {
       leftButton= false;
+	  display();
     }
     else if (state == GLUT_DOWN) {
       leftButton= true;  
       mouseX = x;
       mouseY = y;
+
+	  // Render the scene into the backbuffer
+	  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	  glMatrixMode(GL_MODELVIEW);
+	  glDisable(GL_LIGHT0);
+	  glLoadIdentity();
+	  camera();
+	  sceneGraph->traverse();
+	  glEnable(GL_LIGHT0);
+
+	  //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	  unsigned char pixel[4];
+	  glReadPixels(x, height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+	  
+	  sceneGraph->pick(pixel[0], pixel[1], pixel[2]);
+
+	  // Draw the scene and present it
+	  display();
     }
   }
 }
@@ -344,18 +377,21 @@ void Context::registerCallbacks(void){
   // XXX: add reset option
   
   // INSERT YOUR CODE HERE
-  glutAddMenuEntry("reset", 1);
+  glutAddMenuEntry("Reset", 1);
 
   // END XXX
 
-  glutAddMenuEntry("quit", 2);
+  
 
   // XXX: add more options (optional)
   
-  // INSERT YOUR CODE HERE
+  glutAddMenuEntry("Euler", 2);
+  glutAddMenuEntry("Trackball", 3);
   
   // END XXX
   
+  glutAddMenuEntry("Quit", 4);
+
   glutAttachMenu(GLUT_RIGHT_BUTTON);
   return;
 }

@@ -26,8 +26,9 @@ using namespace std;
     registerCallbacks  - register all callbacks with GLUT
    ------------------------------------------------ */
 
-namespace Context{
+#include "Modes.hpp"
 
+namespace Context{
   // window dimensions
   extern int width, height;
   // initial window position
@@ -54,6 +55,8 @@ namespace Context{
   extern bool leftButton;
   // mouse position in previous frame
   extern int mouseX, mouseY;
+  // rotation mode
+  extern RotationMode rotMode;
 
   // initialize above variables
   void config(void);

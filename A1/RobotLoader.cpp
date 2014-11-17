@@ -81,7 +81,8 @@ Node* RobotLoader::load(const string& filePath) {
 									 static_cast<float>(lua_tonumber(L, -5)),
 									 static_cast<float>(lua_tonumber(L, -4)),
 									 static_cast<float>(lua_tonumber(L, -3)),
-									 static_cast<float>(lua_tonumber(L, -2)));
+									 static_cast<float>(lua_tonumber(L, -2)),
+									 i);
 
 		if(!lua_isnil(L, -1)) {
 			// There is a parent number specified
