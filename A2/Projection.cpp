@@ -441,6 +441,171 @@ void Screen::menu(int value){
   Context::display();
 }
 
+char Clip::menuOptions[] = {0};
+string Clip::menuText[] = {"Test"};
+int Clip::numOptions = 1;
+float Clip::rotation = 0.f;
+bool Clip::lmbDown = false;
+float Clip::mouseX = 0.f;
+float Clip::mouseY = 0.f;
+
+// display scene
+void Clip::display(void) {
+
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHT0);
+
+	glm::vec3 viewDir;
+
+	// 'l' is the normalized viewing direction
+	viewDir[0] = lookat[3].getValue() - lookat[0].getValue();
+	viewDir[1] = lookat[4].getValue() - lookat[1].getValue();
+	viewDir[2] = lookat[5].getValue() - lookat[2].getValue();
+	double viewLength = glm::length(viewDir);
+	viewDir = glm::normalize(viewDir);
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// draw current model if toggled
+	glEnable(GL_LIGHTING);
+	glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
+	glPushMatrix();
+	//gluPerspective(perspective[0].getValue(), perspective[1].getValue(),
+	//			   perspective[2].getValue(), perspective[3].getValue());
+	glMultMatrixf(&projection[0][0]);
+	glTranslatef(0.f, 0.f, -5.0f);
+	glRotatef(180.f, 0, 1, 0);
+	model.draw();
+	glPopMatrix();
+	glDisable(GL_LIGHTING);
+	
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	// apply inverse modelview transformation to axes and frustum
+	// this moves the camera position and frustum into world space
+	// coordinates
+	glMultMatrixf(&glm::inverse(modelView)[0][0]);
+
+	/* draw the axis and eye vector */
+	glPushMatrix();
+	glColor3ub(0, 0, 255);
+	glBegin(GL_LINE_STRIP);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(0.0, 0.0, -1.0 * viewLength);
+	glVertex3f(0.1, 0.0, -0.9 * viewLength);
+	glVertex3f(-0.1, 0.0, -0.9 * viewLength);
+	glVertex3f(0.0, 0.0, -1.0 * viewLength);
+	glVertex3f(0.0, 0.1, -0.9 * viewLength);
+	glVertex3f(0.0, -0.1, -0.9 * viewLength);
+	glVertex3f(0.0, 0.0, -1.0 * viewLength);
+	glEnd();
+	glColor3ub(255, 255, 0);
+	Context::setFont("helvetica", 12);
+	Context::drawString(0.0, 0.0, -1.1 * viewLength, "e");
+	glColor3ub(255, 0, 0);
+	glScalef(0.4, 0.4, 0.4);
+	drawAxes();
+	glPopMatrix();
+
+	// apply inverse projection transformation to unit-frustum
+	glMatrixMode(GL_MODELVIEW);
+	glMultMatrixf(&glm::inverse(projection)[0][0]);
+
+	/* draw the canonical viewing frustum */
+	// back clip plane
+	/*glColor3f(0.2, 0.2, 0.2);
+	glBegin(GL_QUADS);
+	glVertex3i(1, 1, 1);
+	glVertex3i(-1, 1, 1);
+	glVertex3i(-1, -1, 1);
+	glVertex3i(1, -1, 1);
+	glEnd();
+	*/
+	// four corners of frustum
+	glColor3ub(128, 196, 128);
+	glBegin(GL_LINES);
+	glVertex3i(1, 1, -1);
+	glVertex3i(1, 1, 1);
+	glVertex3i(-1, 1, -1);
+	glVertex3i(-1, 1, 1);
+	glVertex3i(-1, -1, -1);
+	glVertex3i(-1, -1, 1);
+	glVertex3i(1, -1, -1);
+	glVertex3i(1, -1, 1);
+	glEnd();
+
+	// front clip plane
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(0.2, 0.2, 0.4, 0.5);
+	glBegin(GL_QUADS);
+	glVertex3i(1, 1, -1);
+	glVertex3i(-1, 1, -1);
+	glVertex3i(-1, -1, -1);
+	glVertex3i(1, -1, -1);
+	glEnd();
+	glDisable(GL_BLEND);
+
+	glPopMatrix();
+
+	glutSwapBuffers();
+
+	glPopAttrib();
+}
+
+// redisplay scene after window reshape
+void Clip::reshape(int width, int height) {
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60.0, (GLfloat) width / height, 1.0, 256.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	// this defines a camera matrix
+	glTranslatef(0.0, 0.0, -2.0);
+	glRotatef(Clip::rotation, 0.0, 1.0, 0.0);
+	glShadeModel(GL_SMOOTH);
+}
+
+void Clip::mouseMoved(int x, int y) {
+	if(lmbDown) {
+		rotation += x - mouseX;
+
+		mouseX = x;
+		mouseY = y;
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		// this defines a camera matrix
+		glTranslatef(0.0, 0.0, -2.0);
+		glRotatef(Clip::rotation, 0.0, 1.0, 0.0);
+		glShadeModel(GL_SMOOTH);
+		Clip::display();
+	}
+	
+}
+
+void Clip::mousePressed(int btn, int state, int x, int y) {
+	if(btn == GLUT_LEFT_BUTTON) {
+		if(state == GLUT_DOWN) {
+			lmbDown = true;
+			mouseX = x;
+			mouseY = y;
+		} else {
+			lmbDown = false;
+		}
+	}
+}
+// mouse menu
+void Clip::menu(int id) {
+
+}
+
+
 // -------------------------------------------------------
 // COMMAND WINDOW
 // -------------------------------------------------------

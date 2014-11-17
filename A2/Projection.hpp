@@ -59,6 +59,10 @@ namespace Clip{
 	extern char menuOptions[];
 	extern std::string menuText[];
 	extern int numOptions;
+	extern float rotation;
+	extern bool lmbDown;
+	extern float mouseX;
+	extern float mouseY;
 
 	// display scene
 	void display(void);
