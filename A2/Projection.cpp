@@ -453,7 +453,6 @@ bool Clip::clipPlanesToggled = false;
 
 // display scene
 void Clip::display(void) {
-
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
