@@ -441,6 +441,201 @@ void Screen::menu(int value){
   Context::display();
 }
 
+char Clip::menuOptions[] = {0, 1};
+string Clip::menuText[] = {"Toggle Model", "Toggle Clip Planes"};
+int Clip::numOptions = 2;
+float Clip::rotation = 0.f;
+bool Clip::lmbDown = false;
+float Clip::mouseX = 0.f;
+float Clip::mouseY = 0.f;
+bool Clip::drawModel = true;
+bool Clip::clipPlanesToggled = false;
+
+// display scene
+void Clip::display(void) {
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHT0);
+
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if(drawModel) {
+		// draw current model if toggled
+		if(clipPlanesToggled) {
+			beginClipping();
+		}
+		
+		glEnable(GL_LIGHTING);
+		glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
+
+		glPushMatrix();
+		glScalef(1.f, 1.f, -1.f);
+		glMultMatrixf(&projection[0][0]);
+		glMultMatrixf(&modelView[0][0]);
+		glEnable(GL_NORMALIZE);
+		model.draw();
+		glDisable(GL_NORMALIZE);
+		glPopMatrix();
+		
+		glDisable(GL_LIGHTING);
+
+		if(clipPlanesToggled) {
+			endClipping();
+		}
+	}
+	
+	
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	// apply inverse modelview transformation to axes and frustum
+	// this moves the camera position and frustum into world space
+	// coordinates
+	/* draw the axis and eye vector */
+	glPushMatrix();
+	glColor3ub(255, 0, 0);
+	glScalef(1.0, 1.0, -1.0);
+	drawAxes();
+	glPopMatrix();
+
+	// apply inverse projection transformation to unit-frustum
+	glMatrixMode(GL_MODELVIEW);
+	/* draw the canonical viewing frustum */
+	// back clip plane
+	glColor3f(0.2, 0.2, 0.2);
+	glBegin(GL_QUADS);
+	glVertex3i(1, 1, -1);
+	glVertex3i(-1, 1, -1);
+	glVertex3i(-1, -1, -1);
+	glVertex3i(1, -1, -1);
+	glEnd();
+	// four corners of frustum
+	glColor3ub(128, 196, 128);
+	glBegin(GL_LINES);
+	glVertex3i(1, 1, -1);
+	glVertex3i(1, 1, 1);
+	glVertex3i(-1, 1, -1);
+	glVertex3i(-1, 1, 1);
+	glVertex3i(-1, -1, -1);
+	glVertex3i(-1, -1, 1);
+	glVertex3i(1, -1, -1);
+	glVertex3i(1, -1, 1);
+	glEnd();
+
+	// front clip plane
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(0.2, 0.2, 0.4, 0.5);
+	glBegin(GL_QUADS);
+	glVertex3i(1, 1, 1);
+	glVertex3i(-1, 1, 1);
+	glVertex3i(-1, -1, 1);
+	glVertex3i(1, -1, 1);
+	glEnd();
+	glDisable(GL_BLEND);
+
+	glPopMatrix();
+
+	glutSwapBuffers();
+
+	glPopAttrib();
+}
+
+// redisplay scene after window reshape
+void Clip::reshape(int width, int height) {
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60.0, (GLfloat) width / height, 1.0, 256.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	// this defines a camera matrix
+	glTranslatef(0.0, 0.0, -3.0);
+	glRotatef(Clip::rotation, 0.0, 1.0, 0.0);
+	glShadeModel(GL_SMOOTH);
+}
+
+void Clip::mouseMoved(int x, int y) {
+	if(lmbDown) {
+		rotation += x - mouseX;
+
+		mouseX = x;
+		mouseY = y;
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		// this defines a camera matrix
+		glTranslatef(0.0, 0.0, -3.0);
+		glRotatef(Clip::rotation, 0.0, 1.0, 0.0);
+		glShadeModel(GL_SMOOTH);
+		Clip::display();
+	}
+	
+}
+
+void Clip::mousePressed(int btn, int state, int x, int y) {
+	if(btn == GLUT_LEFT_BUTTON) {
+		if(state == GLUT_DOWN) {
+			lmbDown = true;
+			mouseX = x;
+			mouseY = y;
+		} else {
+			lmbDown = false;
+		}
+	}
+}
+// mouse menu
+void Clip::menu(int id) {
+	switch(id) {
+		case(0) :
+			toggleModelDrawing();
+			break;
+		case(1) :
+			toggleClipPlanes();
+			break;
+		default:
+		break;
+	}
+}
+
+void Clip::beginClipping() {
+	GLdouble plane0[4] = {0.f, 0.f, -1.f, 1.f};
+	GLdouble plane1[4] = {0.f, 0.f, 1.f, 1.f};
+	GLdouble plane2[4] = {0.f, -1.f, 0.f, 1.f};
+	GLdouble plane3[4] = {0.f, 1.f, 0.f, 1.f};
+	GLdouble plane4[4] = {-1.f, 0.f, 0.f, 1.f};
+	GLdouble plane5[4] = {1.f, 0.f, 0.f, 1.f};
+	glClipPlane(GL_CLIP_PLANE0, plane0);
+	glClipPlane(GL_CLIP_PLANE1, plane1);
+	glClipPlane(GL_CLIP_PLANE2, plane2);
+	glClipPlane(GL_CLIP_PLANE3, plane3);
+	glClipPlane(GL_CLIP_PLANE4, plane4);
+	glClipPlane(GL_CLIP_PLANE5, plane5);
+	glEnable(GL_CLIP_PLANE0);
+	glEnable(GL_CLIP_PLANE1);
+	glEnable(GL_CLIP_PLANE2);
+	glEnable(GL_CLIP_PLANE3);
+	glEnable(GL_CLIP_PLANE4);
+	glEnable(GL_CLIP_PLANE5);
+}
+void Clip::endClipping() {
+	glDisable(GL_CLIP_PLANE0);
+	glDisable(GL_CLIP_PLANE1);
+	glDisable(GL_CLIP_PLANE2);
+	glDisable(GL_CLIP_PLANE3);
+	glDisable(GL_CLIP_PLANE4);
+	glDisable(GL_CLIP_PLANE5);
+}
+
+void Clip::toggleClipPlanes() {
+	clipPlanesToggled = !clipPlanesToggled;
+}
+void Clip::toggleModelDrawing() {
+	drawModel = !drawModel;
+}
+
+
 // -------------------------------------------------------
 // COMMAND WINDOW
 // -------------------------------------------------------
