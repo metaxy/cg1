@@ -72,7 +72,7 @@ class Window{
   
   // register mouse callback
   void registerMousePressed(void mousePressed(int btn, int state, int x, int y));
- 
+
   // register mouse motion callback
   void registerMouseMoved(void mouseMoved(int x, int y));
  
