@@ -1,0 +1,17 @@
+EXECUTABLE= cg1_ex3
+CC= g++
+CPPFLAGS= -O3 -Iglm/
+DEPS= glm/glm.hpp /glm/gtc/matrix_transform.hpp Window.hpp Context.hpp GLSLShader.hpp TriMesh.hpp
+OBJ= Window.o Context.o  GLSLShader.o TriMesh.o Shading.o
+LIBS= -lGLU -lGL -lglut -lGLEW
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CPPFLAGS)x
+
+$(EXECUTABLE): $(OBJ)
+	$(CC) -o $@ $^ $(CPPFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm -f *.o *~ $(EXECUTABLES)		

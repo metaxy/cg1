@@ -1,0 +1,35 @@
+#version 150
+
+layout(triangles) in;
+layout(triangle_strip, max_vertices = 3) out;
+
+in vec4 vertex[3];
+
+out vec4 color;
+
+void main(void) {
+  
+  // compute face normal
+
+  vec3 edge1= vec3(vertex[1]-vertex[0]);
+  vec3 edge2= vec3(vertex[2]-vertex[0]);
+  vec3 faceNormal= cross(edge1, edge2);
+  faceNormal= normalize(faceNormal);
+  // color can't be negative
+  faceNormal.xyz*=0.5;
+  faceNormal.xyz+=0.5;
+
+  color= vec4(faceNormal, 1);
+  gl_Position = gl_in[0].gl_Position;
+  EmitVertex();
+
+  color= vec4(faceNormal, 1);
+  gl_Position = gl_in[1].gl_Position;
+  EmitVertex();
+
+  color= vec4(faceNormal, 1);
+  gl_Position = gl_in[2].gl_Position;
+  EmitVertex();
+  
+  EndPrimitive();
+}

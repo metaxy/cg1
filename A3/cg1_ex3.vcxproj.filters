@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="Shading.cpp" />
+    <ClCompile Include="GLSLShader.cpp" />
+    <ClCompile Include="TriMesh.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Window.hpp" />
+    <ClInclude Include="Context.hpp" />
+    <ClInclude Include="GLSLShader.hpp" />
+    <ClInclude Include="TriMesh.hpp" />
+    <ClInclude Include="Shading.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{a4cc09ea-baa1-4d09-853d-9027e865a3c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{032a7cf4-fcdf-43a3-a5bd-1fd16a5c4825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ressource Files">
+      <UniqueIdentifier>{f3ace7fc-5731-47ef-817b-150a814a8a63}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

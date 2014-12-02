@@ -1,0 +1,25 @@
+#version 150
+
+uniform mat4 modelViewProjectionMatrix;
+uniform mat4 modelViewMatrix;
+uniform mat3 normalMatrix;
+
+in vec4 positionIn;
+in vec3 normalIn;
+
+out vec4 position;
+out vec3 normal;
+
+void main(){
+		
+  // transform to view space
+  position= modelViewMatrix*positionIn;
+  normal= normalMatrix*normalIn;
+
+  // transform to clip space
+  gl_Position = modelViewProjectionMatrix*positionIn;
+}
+
+
+
+	

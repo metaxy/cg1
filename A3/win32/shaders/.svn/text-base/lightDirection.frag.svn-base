@@ -1,0 +1,19 @@
+#version 150
+
+uniform vec4 lightPosition;
+
+in vec4 vertex;
+
+out vec4 pixel;
+
+void main(void){ 
+
+  vec3 lightDirection= vec3(lightPosition-vertex);
+
+ vec4 color= vec4(normalize(lightDirection.xyz),1);
+ // color can't be negative
+ color.xyz*= 0.5;
+ color.xyz+= 0.5;
+
+  pixel= color;			
+}

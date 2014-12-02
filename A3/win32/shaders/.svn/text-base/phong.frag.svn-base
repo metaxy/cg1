@@ -1,0 +1,14 @@
+#version 150
+
+in vec4 position;
+in vec3 normal;
+
+out vec4 pixel;
+
+vec4 blinnPhongReflection(vec4 position, vec3 normal);
+
+void main(void){ 
+
+  pixel= blinnPhongReflection(position, normal);
+		
+}

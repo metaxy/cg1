@@ -1,0 +1,33 @@
+#version 150
+
+struct LightSource{
+  //position in view space
+  vec4 position;
+  // ambient color
+  vec4 ambient;
+  // diffuse color
+  vec4 diffuse;
+  // specular color
+  vec4 specular;
+};
+
+struct Material{
+  // ambient color
+  vec4 ambient;
+  // diffuse color
+  vec4 diffuse;
+  // specular color
+  vec4 specular;
+  // shininess
+  float shininess;
+};
+
+uniform struct LightSource lightSource;
+uniform struct Material material;
+
+// position and normal in view space
+vec4 blinnPhongReflection(vec4 position, vec3 normal){
+	
+
+}
+	
