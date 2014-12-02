@@ -63,6 +63,8 @@ namespace Clip{
 	extern bool lmbDown;
 	extern float mouseX;
 	extern float mouseY;
+	extern bool clipPlanesToggled;
+	extern bool drawModel;
 
 	// display scene
 	void display(void);
@@ -76,6 +78,11 @@ namespace Clip{
 	// mouse menu
 	void menu(int id);
 
+	void beginClipping();
+	void endClipping();
+
+	void toggleClipPlanes();
+	void toggleModelDrawing();
 };
 
 // content of command view sub-window

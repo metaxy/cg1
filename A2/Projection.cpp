@@ -441,57 +441,52 @@ void Screen::menu(int value){
   Context::display();
 }
 
-char Clip::menuOptions[] = {0};
-string Clip::menuText[] = {"Test"};
-int Clip::numOptions = 1;
-float Clip::rotation = 200.f;
+char Clip::menuOptions[] = {0, 1};
+string Clip::menuText[] = {"Toggle Model", "Toggle Clip Planes"};
+int Clip::numOptions = 2;
+float Clip::rotation = 0.f;
 bool Clip::lmbDown = false;
 float Clip::mouseX = 0.f;
 float Clip::mouseY = 0.f;
+bool Clip::drawModel = true;
+bool Clip::clipPlanesToggled = false;
 
 // display scene
 void Clip::display(void) {
-
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LIGHTING_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHT0);
 
-	glm::vec3 viewDir;
-
-	// 'l' is the normalized viewing direction
-	viewDir[0] = lookat[3].getValue() - lookat[0].getValue();
-	viewDir[1] = lookat[4].getValue() - lookat[1].getValue();
-	viewDir[2] = lookat[5].getValue() - lookat[2].getValue();
-	double viewLength = glm::length(viewDir);
-	viewDir = glm::normalize(viewDir);
-
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// draw current model if toggled
-	glEnable(GL_LIGHTING);
-	glEnable(GL_NORMALIZE);
-	glLightfv(GL_LIGHT0, GL_POSITION, &glm::vec3(0.f, 0.f, -1.f)[0]);
-	glPushMatrix();
-	// a1 + r*b1 + s*c1
-	// a2 + r*b2 + s*c2
-	// a3 + r*b3 + s*c3
-	// 
-	GLdouble plane0[4] = {1.f, 0.f, 0.f, 0.f};
-	glClipPlane(GL_CLIP_PLANE0, plane0);
-	glEnable(GL_CLIP_PLANE0);
+	if(drawModel) {
+		// draw current model if toggled
+		if(clipPlanesToggled) {
+			beginClipping();
+		}
+		
+		glEnable(GL_LIGHTING);
+		glLightfv(GL_LIGHT0, GL_POSITION, &lightPos[0]);
 
-	glMultMatrixf(&projection[0][0]);
-	glMultMatrixf(&modelView[0][0]);
-	model.draw();
+		glPushMatrix();
+		glScalef(1.f, 1.f, -1.f);
+		glMultMatrixf(&projection[0][0]);
+		glMultMatrixf(&modelView[0][0]);
+		glEnable(GL_NORMALIZE);
+		model.draw();
+		glDisable(GL_NORMALIZE);
+		glPopMatrix();
+		
+		glDisable(GL_LIGHTING);
 
-	glDisable(GL_CLIP_PLANE0);
-	glPopMatrix();
-	glEnable(GL_NORMALIZE);
-	glDisable(GL_LIGHTING);
+		if(clipPlanesToggled) {
+			endClipping();
+		}
+	}
 	
-
+	
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	// apply inverse modelview transformation to axes and frustum
@@ -499,38 +494,21 @@ void Clip::display(void) {
 	// coordinates
 	/* draw the axis and eye vector */
 	glPushMatrix();
-	glMultMatrixf(&projection[0][0]);
-	glMultMatrixf(&modelView[0][0]);
-	glColor3ub(0, 0, 255);
-	glBegin(GL_LINE_STRIP);
-	glVertex3f(0.0, 0.0, 0.0);
-	glVertex3f(0.0, 0.0, -1.0 * viewLength);
-	glVertex3f(0.1, 0.0, -0.9 * viewLength);
-	glVertex3f(-0.1, 0.0, -0.9 * viewLength);
-	glVertex3f(0.0, 0.0, -1.0 * viewLength);
-	glVertex3f(0.0, 0.1, -0.9 * viewLength);
-	glVertex3f(0.0, -0.1, -0.9 * viewLength);
-	glVertex3f(0.0, 0.0, -1.0 * viewLength);
-	glEnd();
-	glColor3ub(255, 255, 0);
-	Context::setFont("helvetica", 12);
-	Context::drawString(0.0, 0.0, -1.1 * viewLength, "e");
 	glColor3ub(255, 0, 0);
-	glScalef(0.4, 0.4, 0.4);
+	glScalef(1.0, 1.0, -1.0);
 	drawAxes();
 	glPopMatrix();
 
 	// apply inverse projection transformation to unit-frustum
 	glMatrixMode(GL_MODELVIEW);
-
 	/* draw the canonical viewing frustum */
 	// back clip plane
 	glColor3f(0.2, 0.2, 0.2);
 	glBegin(GL_QUADS);
-	glVertex3i(1, 1, 1);
-	glVertex3i(-1, 1, 1);
-	glVertex3i(-1, -1, 1);
-	glVertex3i(1, -1, 1);
+	glVertex3i(1, 1, -1);
+	glVertex3i(-1, 1, -1);
+	glVertex3i(-1, -1, -1);
+	glVertex3i(1, -1, -1);
 	glEnd();
 	// four corners of frustum
 	glColor3ub(128, 196, 128);
@@ -550,10 +528,10 @@ void Clip::display(void) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(0.2, 0.2, 0.4, 0.5);
 	glBegin(GL_QUADS);
-	glVertex3i(1, 1, -1);
-	glVertex3i(-1, 1, -1);
-	glVertex3i(-1, -1, -1);
-	glVertex3i(1, -1, -1);
+	glVertex3i(1, 1, 1);
+	glVertex3i(-1, 1, 1);
+	glVertex3i(-1, -1, 1);
+	glVertex3i(1, -1, 1);
 	glEnd();
 	glDisable(GL_BLEND);
 
@@ -609,7 +587,52 @@ void Clip::mousePressed(int btn, int state, int x, int y) {
 }
 // mouse menu
 void Clip::menu(int id) {
+	switch(id) {
+		case(0) :
+			toggleModelDrawing();
+			break;
+		case(1) :
+			toggleClipPlanes();
+			break;
+		default:
+		break;
+	}
+}
 
+void Clip::beginClipping() {
+	GLdouble plane0[4] = {0.f, 0.f, -1.f, 1.f};
+	GLdouble plane1[4] = {0.f, 0.f, 1.f, 1.f};
+	GLdouble plane2[4] = {0.f, -1.f, 0.f, 1.f};
+	GLdouble plane3[4] = {0.f, 1.f, 0.f, 1.f};
+	GLdouble plane4[4] = {-1.f, 0.f, 0.f, 1.f};
+	GLdouble plane5[4] = {1.f, 0.f, 0.f, 1.f};
+	glClipPlane(GL_CLIP_PLANE0, plane0);
+	glClipPlane(GL_CLIP_PLANE1, plane1);
+	glClipPlane(GL_CLIP_PLANE2, plane2);
+	glClipPlane(GL_CLIP_PLANE3, plane3);
+	glClipPlane(GL_CLIP_PLANE4, plane4);
+	glClipPlane(GL_CLIP_PLANE5, plane5);
+	glEnable(GL_CLIP_PLANE0);
+	glEnable(GL_CLIP_PLANE1);
+	glEnable(GL_CLIP_PLANE2);
+	glEnable(GL_CLIP_PLANE3);
+	glEnable(GL_CLIP_PLANE4);
+	glEnable(GL_CLIP_PLANE5);
+}
+void Clip::endClipping() {
+	glDisable(GL_CLIP_PLANE0);
+	glDisable(GL_CLIP_PLANE1);
+	glDisable(GL_CLIP_PLANE2);
+	glDisable(GL_CLIP_PLANE3);
+	glDisable(GL_CLIP_PLANE4);
+	glDisable(GL_CLIP_PLANE5);
+}
+
+void Clip::toggleClipPlanes() {
+	clipPlanesToggled = !clipPlanesToggled;
+}
+void Clip::toggleModelDrawing() {
+	drawModel = !drawModel;
 }
 
 
