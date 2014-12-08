@@ -404,7 +404,7 @@ int main( int argc, char** argv){
   shadingDemo= new ShadingDemo();
 
   // load mesh
-  shadingDemo->loadMesh(argc > 1 ? argv[1] : "meshes/bunny.off");
+  shadingDemo->loadMesh(argc > 1 ? argv[1] : "meshes/drei.off");
   
   glutMainLoop();
 
