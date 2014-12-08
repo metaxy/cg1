@@ -97,8 +97,6 @@ protected:
   glm::vec3 boundingBoxMin;
   glm::vec3 boundingBoxMax;
 
-  GLfloat* m_vertices;
-  GLuint* m_indices;
   int m_numVertices = 0;
   int m_numPolygons = 0;
 };

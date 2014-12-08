@@ -29,15 +29,11 @@ const GLuint TriMesh::attribNormal= 2;
 const GLuint TriMesh::attribColor= 3;
 const GLuint TriMesh::attribTexCoord= 8;
 
-TriMesh::TriMesh() : 
-m_vertices(nullptr),
-m_indices(nullptr) {
+TriMesh::TriMesh() {
   winding= CW;
 }
 
-TriMesh::TriMesh(const std::string& filename) : 
-m_vertices(nullptr),
-m_indices(nullptr) {
+TriMesh::TriMesh(const std::string& filename) {
   winding= CW;
   loadOff(filename);
   center();
@@ -46,8 +42,6 @@ m_indices(nullptr) {
 }
 
 TriMesh::~TriMesh(){
-	delete[] m_vertices;
-	delete[] m_indices;
 }
 
 void TriMesh::setWinding(PolygonWinding winding){
@@ -108,15 +102,9 @@ void TriMesh::calculateBoundingBox(void){
 
 // load triangle mesh in .OFF format
 void TriMesh::loadOff(const string& filename){
-	cout << filename << m_vertices << " " << m_indices << endl;
-	if(m_vertices) {
-		//delete[] m_vertices;
-		m_vertices = nullptr;
-	}
-	if(m_indices) {
-	//	delete[] m_indices;
-		m_indices = nullptr;
-	}
+	positions.clear();
+	normals.clear();
+	faces.clear();
 
 	ifstream inStream;
 	inStream.open(filename.c_str());
@@ -139,27 +127,19 @@ void TriMesh::loadOff(const string& filename){
 		} else if(lineNumber == 1) {
 			stringstream sStream(line);
 			sStream >> m_numVertices >> m_numPolygons;
-			m_vertices = new GLfloat[m_numVertices * 3];
-			m_indices = new GLuint[m_numPolygons * 3];
 		} else {
-			if(m_numVertices > numVerticesRead) {
+			if(m_numVertices > positions.size()) {
 				GLfloat x, y, z;
 				stringstream sStream(line);
 				sStream >> x >> y >> z;
-				//cout << numVerticesRead << " " << x << " " << y << " " << z << endl;
-				m_vertices[numVerticesRead*3] = x;
-				m_vertices[numVerticesRead*3 + 1] = y;
-				m_vertices[numVerticesRead*3 + 2] = z;
-				numVerticesRead++;
+				
+				positions.push_back(glm::vec3(x, y, z));
 			} else {
 				GLuint i, a, b, c;
 				stringstream sStream(line);
 				sStream >> i >> a >> b >> c;
-				//cout << numPolygonsRead << " " << a << " " << b << " " << c << endl;
-				m_indices[numPolygonsRead*3] = a;
-				m_indices[numPolygonsRead*3 + 1] = b;
-				m_indices[numPolygonsRead*3 + 2] = c;
-				numPolygonsRead++;
+				
+				faces.push_back(glm::uvec3(a, b, c));
 			}
 		}
 
@@ -177,10 +157,10 @@ void TriMesh::computeNormals(void){
 // draw the mesh using vertex arrays
 void TriMesh::draw(void){
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, m_vertices);
+	glVertexPointer(3, GL_FLOAT, 0, &positions[0]);
 
 	// draw a cube
-	glDrawElements(GL_TRIANGLES, m_numPolygons * 3, GL_UNSIGNED_INT, m_indices);
+	glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, &faces[0]);
 
 	// deactivate vertex arrays after drawing
 	glDisableClientState(GL_VERTEX_ARRAY);
