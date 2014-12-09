@@ -139,7 +139,12 @@ void TriMesh::loadOff(const string& filename){
 				stringstream sStream(line);
 				sStream >> i >> a >> b >> c;
 				
-				faces.push_back(glm::uvec3(a, b, c));
+				if(winding == PolygonWinding::CCW) {
+					faces.push_back(glm::uvec3(a, b, c));
+				} else {
+					faces.push_back(glm::uvec3(c, b, a));
+				}
+				
 			}
 		}
 
@@ -156,6 +161,7 @@ void TriMesh::computeNormals(void){
 
 // draw the mesh using vertex arrays
 void TriMesh::draw(void){
+	// TODO: Change drawing function to using VAOs
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, &positions[0]);
 
