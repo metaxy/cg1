@@ -27,7 +27,5 @@ uniform struct Material material;
 
 // position and normal in view space
 vec4 blinnPhongReflection(vec4 position, vec3 normal){
-	
-
 }
 	

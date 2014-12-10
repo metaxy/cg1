@@ -24,5 +24,58 @@
     <Filter Include="Ressource Files">
       <UniqueIdentifier>{f3ace7fc-5731-47ef-817b-150a814a8a63}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{3aa2e84b-607d-40a1-8aeb-7825ff6854e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\blinnPhongReflection">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\color.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\color.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\colorTriangle.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\colorTriangle.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\colorTriangle.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\normalViz.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\normalViz.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\faceNormalViz.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\faceNormalViz.geom">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\faceNormalViz.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\lightDirection.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\lightDirection.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\flat.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\flat.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\flat.geom">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -296,7 +296,7 @@ void Context::mousePressed(int button, int state, int x, int y){
 void Context::mouseMoved(int x, int y){
 	
   if(mouseButton==LEFT_MOUSE){
-    vec3 rayOrigin = vec3(0,0,cameraZ);
+    vec3 rayOrigin = vec3(0,0, cameraZ);
     vec3 rayTarget= glm::unProject(vec3(x,y,nearPlane),viewMatrix,projectionMatrix,vec4(0, 0, windowSize.x, windowSize.y));
     vec3 rayDir= -normalize(rayTarget-rayOrigin);
 		

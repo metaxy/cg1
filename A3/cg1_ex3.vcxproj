@@ -94,6 +94,24 @@
     <ClInclude Include="TriMesh.hpp" />
     <ClInclude Include="Shading.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\blinnPhongReflection" />
+    <None Include="shaders\color.frag" />
+    <None Include="shaders\color.vert" />
+    <None Include="shaders\colorTriangle.frag" />
+    <None Include="shaders\colorTriangle.geom" />
+    <None Include="shaders\colorTriangle.vert" />
+    <None Include="shaders\faceNormalViz.frag" />
+    <None Include="shaders\faceNormalViz.geom" />
+    <None Include="shaders\faceNormalViz.vert" />
+    <None Include="shaders\flat.frag" />
+    <None Include="shaders\flat.geom" />
+    <None Include="shaders\flat.vert" />
+    <None Include="shaders\lightDirection.frag" />
+    <None Include="shaders\lightDirection.vert" />
+    <None Include="shaders\normalViz.frag" />
+    <None Include="shaders\normalViz.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
