@@ -107,10 +107,15 @@
     <None Include="shaders\flat.frag" />
     <None Include="shaders\flat.geom" />
     <None Include="shaders\flat.vert" />
+    <None Include="shaders\gouraud.frag" />
+    <None Include="shaders\gouraud.geom" />
+    <None Include="shaders\gouraud.vert" />
     <None Include="shaders\lightDirection.frag" />
     <None Include="shaders\lightDirection.vert" />
     <None Include="shaders\normalViz.frag" />
     <None Include="shaders\normalViz.vert" />
+    <None Include="shaders\phong.frag" />
+    <None Include="shaders\phong.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

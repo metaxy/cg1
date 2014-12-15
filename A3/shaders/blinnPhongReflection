@@ -1,6 +1,6 @@
 #version 150
 
-struct LightSource{
+struct LightSource {
   //position in view space
   vec4 position;
   // ambient color
@@ -11,7 +11,7 @@ struct LightSource{
   vec4 specular;
 };
 
-struct Material{
+struct Material {
   // ambient color
   vec4 ambient;
   // diffuse color
@@ -22,22 +22,19 @@ struct Material{
   float shininess;
 };
 
-uniform struct LightSource lightSource;
-uniform struct Material material;
+uniform LightSource lightSource;
+uniform Material material;
 
-// position and normal in viewa space
+// position and normal in view space
 vec4 blinnPhongReflection(vec4 position, vec3 normal){
 	vec4 ambientColor = lightSource.ambient * material.ambient;
 
-	vec4 diffuseColor = saturate(lightSource.diffuse * material.diffuse * dot(normal, normalize(lightSource.position - position)));
+	vec3 lightDirection = normalize(lightSource.position.xyz - position.xyz);
+	float diff = dot(lightDirection, normal);
 
-	vec3 E = vec3(0, 0, 0) - position.xyz;
-	vec3 L = lightSource.position.xyz - position.xyz;
-	vec3 H = normalize(E+L);
-	float specAngle = saturate(dot(H, N));
+	vec3 H = normalize(lightDirection - position.xyz);
+	float specAngle = max(dot(H, normal), 0.0);
 
-	vec4 specularColor = lightSource.specular * material.specular * pow(specAngle, 16);
-
-	return saturate(ambientColor + diffuseColor + specularColor);
+	vec4 specularColor = lightSource.specular * material.specular * pow(material.shininess, specAngle);
+	return ambientColor + diff*lightSource.diffuse*(material.diffuse + specularColor);
 }
-	

@@ -177,7 +177,7 @@ void TriMesh::computeNormals(void){
 		}
 
 		normal /= numFaces;
-		normals.push_back(normal);
+		normals.push_back(glm::normalize(normal));
 	}
 }
 

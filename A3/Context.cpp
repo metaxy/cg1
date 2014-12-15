@@ -313,7 +313,6 @@ void Context::mouseMoved(int x, int y){
     }
     lightSource.position= vec4(lightDistance*(rayOrigin+t*rayDir),1);
     lightSource.position.y*= -1;
-    //	cout << "light " << lightSource.position.x  << " " << lightSource.position.y << " " << lightSource.position.z << " " << lightSource.position.w << " " <<  length(vec3(lightSource.position)) << endl;
 
     display();
   }
