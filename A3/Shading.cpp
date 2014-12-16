@@ -208,7 +208,7 @@ void ShadingDemo::drawNoShading(void) {
 void ShadingDemo::drawFlatShading(void) {
 	// TODO: compute flat shading
 	flatShader.bind();
-	flatShader.setUniform("lightSource.position", Context::lightSource.position); 
+	flatShader.setUniform("lightSource.position", Context::viewMatrix*Context::lightSource.position); 
 	flatShader.setUniform("lightSource.ambient", Context::lightSource.ambient);
 	flatShader.setUniform("lightSource.diffuse", Context::lightSource.diffuse);
 	flatShader.setUniform("lightSource.specular", Context::lightSource.specular);
@@ -218,7 +218,6 @@ void ShadingDemo::drawFlatShading(void) {
 	flatShader.setUniform("material.shininess", Context::material.shininess);
 	flatShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
 	flatShader.setUniform("modelViewMatrix", Context::viewMatrix*Context::modelMatrix);
-	flatShader.setUniform("normalMatrix", mat3(transpose(inverse(Context::viewMatrix*Context::modelMatrix))));
 	mesh.draw();
 	flatShader.unbind();
 }
@@ -228,7 +227,7 @@ void ShadingDemo::drawGouraudShading(void) {
 	// TODO: compute gouraud shading
 	// TODO: compute flat shading
 	gouraudShader.bind();
-	gouraudShader.setUniform("lightSource.position", Context::lightSource.position);
+	gouraudShader.setUniform("lightSource.position", Context::viewMatrix*Context::lightSource.position);
 	gouraudShader.setUniform("lightSource.ambient", Context::lightSource.ambient);
 	gouraudShader.setUniform("lightSource.diffuse", Context::lightSource.diffuse);
 	gouraudShader.setUniform("lightSource.specular", Context::lightSource.specular);
@@ -256,7 +255,7 @@ void ShadingDemo::drawPhongShading(void) {
 
 	// TODO: compute phong shading
 	phongShader.bind();
-	phongShader.setUniform("lightSource.position", Context::lightSource.position);
+	phongShader.setUniform("lightSource.position", Context::viewMatrix*Context::lightSource.position);
 	phongShader.setUniform("lightSource.ambient", Context::lightSource.ambient);
 	phongShader.setUniform("lightSource.diffuse", Context::lightSource.diffuse);
 	phongShader.setUniform("lightSource.specular", Context::lightSource.specular);

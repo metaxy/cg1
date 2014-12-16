@@ -5,9 +5,11 @@ uniform mat4 modelViewMatrix;
 
 in vec4 position;
 
-out vec4 vertex;
+out vec4 vertexPosition;
 
 void main(){
-	vertex = modelViewMatrix * position;
-  gl_Position = modelViewProjectionMatrix * position;
+	// Pass the model view vertex position to the geometry shader
+	vertexPosition = modelViewMatrix * position;
+
+	gl_Position = modelViewProjectionMatrix * position;
 }
