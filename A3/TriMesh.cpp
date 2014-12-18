@@ -217,6 +217,13 @@ void TriMesh::computeNormals(void){
 
 // draw the mesh using vertex arrays
 void TriMesh::draw(int renderMode) {
+	/* To 8.) Vertex buffers store the data directly in the memory of the graphics card
+	while vertex arrays use data stored in the RAM used by the CPU.
+	It is best to use vertex buffers for static geometry since modifying these is very
+	expensive whereas modifying the vertex arrays is not so expensive so they
+	are most likely used for dynamic geometry and data.	
+	*/
+
 	if(renderMode == 0) {
 		// Draw the model with vertex arrays
 
