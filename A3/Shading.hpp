@@ -20,6 +20,11 @@ enum Mode{
     DEBUG
   };
 
+enum RenderMode {
+	VERTEX_ARRAY,
+	VERTEX_BUFFER
+};
+
 class ShadingDemo{
   
 public:
@@ -41,6 +46,13 @@ public:
 
   // switch between DEBUG and RELEASE mode
   void setMode(enum Mode mode);
+
+  inline void setRenderMode(enum RenderMode mode) {
+	  renderMode = mode;
+  }
+  inline RenderMode getRenderMode() const {
+	  return renderMode;
+  }
 
 private:
   
@@ -71,6 +83,7 @@ private:
   enum ShadingAlgorithm shading;
   
   enum Mode mode;
+  enum RenderMode renderMode;
 
   // the shaders
   // provided example shaders

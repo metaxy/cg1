@@ -81,7 +81,6 @@ ShadingDemo::ShadingDemo() {
 
 	gouraudShader.loadVertexShader("shaders/blinnPhongReflection");
 	gouraudShader.loadVertexShader("shaders/gouraud.vert");
-	//gouraudShader.loadGeometryShader("shaders/gouraud.geom");
 	gouraudShader.loadFragmentShader("shaders/gouraud.frag");
 	gouraudShader.bindVertexAttrib("position", TriMesh::attribVertex);
 	gouraudShader.bindVertexAttrib("normal", TriMesh::attribNormal);
@@ -96,6 +95,7 @@ ShadingDemo::ShadingDemo() {
 
 	shading = NONE;
 	mode = RELEASE;
+	renderMode = VERTEX_ARRAY;
 }
 
 ShadingDemo::~ShadingDemo() {
@@ -161,7 +161,7 @@ void ShadingDemo::drawColoredTriangles(void) {
 	// draw first vertex in triangle in red, second in green, and third in blue
 	colorTriangleShader.bind();
 	colorTriangleShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
-	mesh.draw();
+	mesh.draw(renderMode);
 	colorTriangleShader.unbind();
 }
 
@@ -170,7 +170,8 @@ void ShadingDemo::visualizeFaceNormals(void) {
 	// TODO: visualize face normals
 	faceNormalVizShader.bind();
 	faceNormalVizShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
-	mesh.draw();
+	faceNormalVizShader.setUniform("modelViewMatrix", Context::viewMatrix*Context::modelMatrix);
+	mesh.draw(renderMode);
 	faceNormalVizShader.unbind();
 }
 
@@ -180,7 +181,7 @@ void ShadingDemo::visualizeNormals(void) {
 	normalVizShader.bind();
 	normalVizShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
 	normalVizShader.setUniform("normalMatrix", mat3(transpose(inverse(Context::viewMatrix*Context::modelMatrix))));
-	mesh.draw();
+	mesh.draw(renderMode);
 	normalVizShader.unbind();
 }
 
@@ -191,7 +192,7 @@ void ShadingDemo::visualizeLightDirection(void) {
 	lightDirectionShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
 	lightDirectionShader.setUniform("modelMatrix", Context::modelMatrix);
 	lightDirectionShader.setUniform("lightPos", Context::lightSource.position);
-	mesh.draw();
+	mesh.draw(renderMode);
 	lightDirectionShader.unbind();
 }
 
@@ -201,7 +202,7 @@ void ShadingDemo::drawNoShading(void) {
 	colorShader.bind();
 	colorShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
 	colorShader.setUniform("color", vec4(1.0f, 0.0f, 0.5f, 1.0f));
-	mesh.draw();
+	mesh.draw(renderMode);
 	colorShader.unbind();
 }
 
@@ -218,7 +219,7 @@ void ShadingDemo::drawFlatShading(void) {
 	flatShader.setUniform("material.shininess", Context::material.shininess);
 	flatShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
 	flatShader.setUniform("modelViewMatrix", Context::viewMatrix*Context::modelMatrix);
-	mesh.draw();
+	mesh.draw(renderMode);
 	flatShader.unbind();
 }
 
@@ -238,7 +239,7 @@ void ShadingDemo::drawGouraudShading(void) {
 	gouraudShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
 	gouraudShader.setUniform("modelViewMatrix", Context::viewMatrix*Context::modelMatrix);
 	gouraudShader.setUniform("normalMatrix", mat3(transpose(inverse(Context::viewMatrix*Context::modelMatrix))));
-	mesh.draw();
+	mesh.draw(renderMode);
 	gouraudShader.unbind();
 	/*
 	gouraudShader.setUniform("lightSource.ambient", Context::lightSource.ambient);
@@ -266,7 +267,7 @@ void ShadingDemo::drawPhongShading(void) {
 	phongShader.setUniform("modelViewProjectionMatrix", Context::projectionMatrix*Context::viewMatrix*Context::modelMatrix);
 	phongShader.setUniform("modelViewMatrix", Context::viewMatrix*Context::modelMatrix);
 	phongShader.setUniform("normalMatrix", mat3(transpose(inverse(Context::viewMatrix*Context::modelMatrix))));
-	mesh.draw();
+	mesh.draw(renderMode);
 	phongShader.unbind();
 	/*
 	phongShader.setUniform("lightSource.ambient", Context::lightSource.ambient);

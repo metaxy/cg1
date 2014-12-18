@@ -18,6 +18,7 @@
 #elif _WIN32
 #include "win32/glew.h"
 #include "win32/glut.h"
+#include <Windows.h>
 #else
   #include <GL/glew.h>
 #include <GL/glut.h>
@@ -141,4 +142,8 @@ public:
   static const std::string menuText[];
   static const int numOptions;
 
+  // Timing
+#ifdef WIN32
+  static DWORD msecTime;
+#endif
 };
