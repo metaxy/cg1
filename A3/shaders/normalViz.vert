@@ -9,10 +9,10 @@ out vec4 vertexColor;
 
 void main(){
 	// Assign the normal as color of the vertex
-	color= vec4(normalize(normal), 1.0);
+	vertexColor = vec4(normalize(normal), 1.0);
 
 	// Transform the normal into color space
-	color.xyz /= 2.0;
-	color.xyz += 0.5;
+	vertexColor.xyz /= 2.0;
+	vertexColor.xyz += 0.5;
 	gl_Position = modelViewProjectionMatrix*position;
 }

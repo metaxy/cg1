@@ -80,9 +80,6 @@
     <None Include="shaders\gouraud.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\gouraud.geom">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="shaders\gouraud.vert">
       <Filter>Shaders</Filter>
     </None>

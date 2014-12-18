@@ -10,16 +10,17 @@ out vec4 color;
 vec4 blinnPhongReflection(vec4 position, vec3 normal);
 
 void main(void) {
-	// Compute the normal of the current triangle face
-	vec3 edgeV0V1= vec3(vertexPosition[1] - vertexPosition[0]);
-	vec3 edgeV0V2= vec3(vertexPosition[2] - vertexPosition[0]);
-	vec3 faceNormal= cross(edgeV0V1, edgeV0V2);
-	faceNormal= normalize(faceNormal);
+	// Compute two edges of the triangle
+	vec3 e1 = vec3(vertexPosition[1].xyz - vertexPosition[0].xyz);
+	vec3 e2 = vec3(vertexPosition[2].xyz - vertexPosition[0].xyz);
+	
+	// Compute the cross product of both edges which is the normal
+	vec3 normal = normalize(cross(e1, e2));
 
 	// Calculate the mid point of the triangle
-	vec4 triangleMid = (vertexPosition[0] + vertexPosition[1] + vertexPosition[2]) * 1.0/3.0;
+	vec4 triangleMid = (vertexPosition[0] + vertexPosition[1] + vertexPosition[2]) / 3.0;
 
-	// Calculate the visible color for all three vertices
+	// Calculate the color of the face from the triangle mid
 	color = blinnPhongReflection(triangleMid, faceNormal);
 
 	// Send the triangle to the rasterizer

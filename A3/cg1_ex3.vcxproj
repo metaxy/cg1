@@ -108,7 +108,6 @@
     <None Include="shaders\flat.geom" />
     <None Include="shaders\flat.vert" />
     <None Include="shaders\gouraud.frag" />
-    <None Include="shaders\gouraud.geom" />
     <None Include="shaders\gouraud.vert" />
     <None Include="shaders\lightDirection.frag" />
     <None Include="shaders\lightDirection.vert" />

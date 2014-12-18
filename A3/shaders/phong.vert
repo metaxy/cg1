@@ -11,6 +11,8 @@ out vec4 vertexPosition;
 out vec3 vertexNormal;
 
 void main(){
+	// Just pass the vertex position and normal in view space to the fragment shader
+	// (they will be interpolated)
 	vertexPosition = modelViewMatrix * position;
 	vertexNormal = normalMatrix * normal;
 	gl_Position = modelViewProjectionMatrix * position;

@@ -7,10 +7,12 @@ in vec4 worldPos;
 out vec4 pixel;
 
 void main(void){ 
-	vec4 lightDir = normalize(worldPos - lightPos);
+	// Calculate the light direction
+	vec4 lightDirection = normalize(worldPos - lightPos);
 
-	lightDir.xyz*=0.5;
-	lightDir.xyz+=0.5;
+	// Bring the light direction vector into valid color space
+	lightDirection.xyz /= 2.0;
+	lightDirection.xyz += 0.5;
 
-    pixel = lightDir;			
+    pixel = lightDirection;			
 }
