@@ -57,6 +57,9 @@ public:
   // load the mesh from an off file
   void loadOff(const std::string& filename);
 
+  // create the vertex buffers
+  void createVertexBuffers();
+
   // normalize to bounding sphere radius 1
   void unitize(void);
   // center model
@@ -70,7 +73,7 @@ public:
   void computeNormals(void);
 
   // draw the model
-  void draw(void);
+  void draw(int renderMode);
   
   // vertex attribute bindings
   // see https://www.opengl.org/sdk/docs/tutorials/ClockworkCoders/attributes.php
@@ -78,7 +81,7 @@ public:
   static const GLuint attribNormal;
   static const GLuint attribColor;
   static const GLuint attribTexCoord;
-  
+
 protected:
 
   // Position of the vertices
@@ -87,6 +90,10 @@ protected:
   std::vector<glm::vec3> normals;
   // indices of the faces
   std::vector<glm::uvec3> faces;
+
+  // for the vbo functionality
+  GLuint positionsID;
+  GLuint normalsID;
 
   PolygonWinding winding;
 

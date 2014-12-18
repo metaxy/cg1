@@ -39,9 +39,12 @@ TriMesh::TriMesh(const std::string& filename) {
   center();
   unitize();
   computeNormals();
+  createVertexBuffers();
 }
 
 TriMesh::~TriMesh(){
+	glDeleteBuffers(1, &positionsID);
+	glDeleteBuffers(1, &normalsID);
 }
 
 void TriMesh::setWinding(PolygonWinding winding){
@@ -102,10 +105,14 @@ void TriMesh::calculateBoundingBox(void){
 
 // load triangle mesh in .OFF format
 void TriMesh::loadOff(const string& filename){
+	// Clear all lists and buffers
 	positions.clear();
 	normals.clear();
 	faces.clear();
+	glDeleteBuffers(1, &positionsID);
+	glDeleteBuffers(1, &normalsID);
 
+	// Open the model file
 	ifstream inStream;
 	inStream.open(filename.c_str());
 
@@ -117,28 +124,33 @@ void TriMesh::loadOff(const string& filename){
 	int lineNumber = 0;
 
 	int numVerticesRead = 0;
-	int numPolygonsRead = 0;
-	
+	int numFacesRead = 0;
+
+	// Read the file line by line
 	while(getline(inStream, line)) {
 		if(lineNumber == 0) {
+			// First line has to be "Off"
 			if(line != "OFF") { 
 				exit(1);
 			}
 		} else if(lineNumber == 1) {
+			// Second line contains number of vertices and faces
 			stringstream sStream(line);
 			sStream >> m_numVertices >> m_numPolygons;
 		} else {
 			if(m_numVertices > positions.size()) {
+				// Read a vertex and add it to the list
 				GLfloat x, y, z;
 				stringstream sStream(line);
 				sStream >> x >> y >> z;
-				
+
 				positions.push_back(glm::vec3(x, y, z));
 			} else {
+				// Read a face, make sure the winding is correct and add it to the list
 				GLuint i, a, b, c;
 				stringstream sStream(line);
 				sStream >> i >> a >> b >> c;
-				
+
 				if(winding == PolygonWinding::CW) {
 					faces.push_back(glm::uvec3(a, b, c));
 				} else {
@@ -152,11 +164,30 @@ void TriMesh::loadOff(const string& filename){
 	}
 }
 
+// create the vertex buffers
+void TriMesh::createVertexBuffers() {
+	// Create a vertex buffer for the positions and fill it with the data
+	glGenBuffers(1, &positionsID);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * 3 * positions.size(), 
+				 &(positions[0][0]), GL_STATIC_DRAW | GL_STATIC_READ);
+
+	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+
+	// Create a vertex buffer for the normals and fill it with the data
+	glGenBuffers(1, &normalsID);
+	glBindBuffer(GL_ARRAY_BUFFER, normalsID);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GL_FLOAT) * 3 * normals.size(),
+				 &(normals[0][0]), GL_STATIC_DRAW | GL_STATIC_READ);
+
+	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+}
 
 // calculate smooth per-vertex normals
 void TriMesh::computeNormals(void){
 	vector<vec3> faceNormals;
 
+	// Calculate the normals for all faces
 	for(uvec3 face : faces) {
 		faceNormals.push_back(
 			glm::normalize(glm::cross(
@@ -165,10 +196,12 @@ void TriMesh::computeNormals(void){
 			)));
 	}
 
+	// Iterate over all vertices
 	for(int i = 0; i < positions.size(); ++i) {
 		int numFaces = 0;
 		vec3 normal = vec3(0, 0, 0);
 
+		// Determin which face contains this vertex and add the face normal to the vertex normal
 		for(int j = 0; j < faces.size(); ++j) {
 			if(faces[j].x == i || faces[j].y == i || faces[j].z == i) {
 				++numFaces;
@@ -176,18 +209,38 @@ void TriMesh::computeNormals(void){
 			}
 		}
 
+		// Weight the face normals and calculate the final vertex normal
 		normal /= numFaces;
 		normals.push_back(glm::normalize(normal));
 	}
 }
 
 // draw the mesh using vertex arrays
-void TriMesh::draw(void){
-	glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, &positions[0]);
-	glEnableVertexAttribArray(attribVertex);
+void TriMesh::draw(int renderMode) {
+	if(renderMode == 0) {
+		// Draw the model with vertex arrays
 
-	glVertexAttribPointer(attribNormal, 3, GL_FLOAT, GL_FALSE, 0, &normals[0]);
-	glEnableVertexAttribArray(attribNormal);
+		glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, &positions[0]);
+		glEnableVertexAttribArray(attribVertex);
 
-	glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, &faces[0]);
+		glVertexAttribPointer(attribNormal, 3, GL_FLOAT, GL_FALSE, 0, &normals[0]);
+		glEnableVertexAttribArray(attribNormal);
+
+		glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, &faces[0]);
+	} else if(renderMode == 1) {
+		// Draw the model with vertex buffers
+
+		glEnableVertexAttribArray(attribVertex);
+		glEnableVertexAttribArray(attribNormal);
+
+		glBindBuffer(GL_ARRAY_BUFFER, positionsID);
+		glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+		glBindBuffer(GL_ARRAY_BUFFER, normalsID);
+		glVertexAttribPointer(attribNormal, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
+		glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, &faces[0]);
+
+		glBindBuffer(GL_ARRAY_BUFFER, NULL);
+	}
 }
