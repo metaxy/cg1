@@ -27,14 +27,28 @@ uniform Material material;
 
 // position and normal in view space
 vec4 blinnPhongReflection(vec4 position, vec3 normal){
+	// Calculate the ambient color
 	vec4 ambientColor = lightSource.ambient * material.ambient;
 
+	// Calculate the light direction and the diffusive strength
 	vec3 lightDirection = normalize(lightSource.position.xyz - position.xyz);
-	float diff = dot(lightDirection, normal);
+	float diffAngle = max(dot(lightDirection, normal), 0.);
+	vec4 diffuseColor = diffAngle * lightSource.diffuse * material.diffuse;
 
-	vec3 H = normalize(lightDirection - position.xyz);
-	float specAngle = max(dot(H, normal), 0.0);
 
-	vec4 specularColor = lightSource.specular * material.specular * pow(material.shininess, specAngle);
-	return ambientColor + diff*lightSource.diffuse*(material.diffuse + specularColor);
+	float specularIntensity = 0.;
+
+	if(diffAngle > 0) {
+		// Calculate the specular angle (eye position is (0,0,0,1))
+		vec3 H = normalize(lightDirection - position.xyz);
+		float specAngle = max(dot(H, normal), 0.);
+
+		// Calculate the specular intensity
+		specularIntensity = pow(specAngle, material.shininess);
+	}
+
+	// Calculate the specular color
+	vec4 specularColor = lightSource.specular * material.specular * specularIntensity;
+
+	return ambientColor + diffuseColor + specularColor;
 }

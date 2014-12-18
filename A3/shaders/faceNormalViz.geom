@@ -16,7 +16,7 @@ void main(void) {
 	vec3 normal = normalize(cross(e1, e2));
 
 	// Transform the normal into color space
-	normal /= 2;
+	normal /= 2.0;
 	normal += 0.5;
 
 	// Send the primitive with its attributes to the next shader stage
