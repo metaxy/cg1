@@ -79,9 +79,9 @@ ShadingDemo::ShadingDemo() {
 	flatShader.bindVertexAttrib("position", TriMesh::attribVertex);
 	flatShader.link();
 
+	gouraudShader.loadVertexShader("shaders/blinnPhongReflection");
 	gouraudShader.loadVertexShader("shaders/gouraud.vert");
-	gouraudShader.loadGeometryShader("shaders/blinnPhongReflection");
-	gouraudShader.loadGeometryShader("shaders/gouraud.geom");
+	//gouraudShader.loadGeometryShader("shaders/gouraud.geom");
 	gouraudShader.loadFragmentShader("shaders/gouraud.frag");
 	gouraudShader.bindVertexAttrib("position", TriMesh::attribVertex);
 	gouraudShader.bindVertexAttrib("normal", TriMesh::attribNormal);
