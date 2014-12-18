@@ -121,6 +121,7 @@ void ShadingDemo::loadMesh(const string& fileName) {
 	mesh.center();
 	mesh.unitize();
 	mesh.computeNormals();
+	mesh.createVertexBuffers();
 }
 
 void ShadingDemo::draw() {

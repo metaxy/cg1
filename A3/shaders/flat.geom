@@ -21,7 +21,7 @@ void main(void) {
 	vec4 triangleMid = (vertexPosition[0] + vertexPosition[1] + vertexPosition[2]) / 3.0;
 
 	// Calculate the color of the face from the triangle mid
-	color = blinnPhongReflection(triangleMid, faceNormal);
+	color = blinnPhongReflection(triangleMid, normal);
 
 	// Send the triangle to the rasterizer
 	gl_Position = gl_in[0].gl_Position;
