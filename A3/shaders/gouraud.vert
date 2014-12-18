@@ -7,11 +7,14 @@ uniform mat3 normalMatrix;
 in vec4 position;
 in vec3 normal;
 
-out vec4 vertex;
-out vec3 vertexNormal;
+out vec4 vertexColor;
+
+vec4 blinnPhongReflection(vec4 position, vec3 normal);
 
 void main(){
-	vertex = modelViewMatrix * position;
-	vertexNormal = normalMatrix * normal;
-  gl_Position = modelViewProjectionMatrix * position;
+	vec4 vertexPosition = modelViewMatrix * position;
+	vec3 vertexNormal = normalMatrix * normal;
+
+	vertexColor = blinnPhongReflection(vertexPosition, vertexNormal);
+	gl_Position = modelViewProjectionMatrix * position;
 }

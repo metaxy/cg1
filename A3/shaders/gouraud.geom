@@ -7,7 +7,7 @@ uniform mat4 modelViewMatrix;
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 3) out;
 
-in vec4 vertex[3];
+in vec4 vertexPosition[3];
 in vec3 vertexNormal[3];
 
 out vec4 color;
