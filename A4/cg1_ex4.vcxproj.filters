@@ -16,4 +16,17 @@
     <ClInclude Include="TriMesh.hpp" />
     <ClInclude Include="Window.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{b2242fd1-669a-4e17-8e68-a39be8549ac2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\quad.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\quad.vert">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>

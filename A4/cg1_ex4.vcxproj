@@ -26,6 +26,10 @@
     <ClInclude Include="TriMesh.hpp" />
     <ClInclude Include="Window.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\quad.frag" />
+    <None Include="shaders\quad.vert" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>
     <ProjectName>cg1_ex4</ProjectName>

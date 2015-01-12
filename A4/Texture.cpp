@@ -31,21 +31,23 @@
 #include "Texture.hpp"
 #include "TriMesh.hpp"
 #include "Image.hpp"
+#include "GLSLShader.hpp"
 
 using namespace glm;
 using namespace std;
 
 static TriMesh mesh;
 // full screen quad
-// static TriMesh quad("data/quad.off", false); // do not center and unitize
+static TriMesh quad("data/quad.off", false); // do not center and unitize
 
 #define PI  3.14159265358979323846264338327950288f
 #define RADIANS(x) (((x)*PI)/180.0f)
 
 // current state of mouse action
-static enum{
-  ROTATE, SHIFT_XY, SHIFT_Z, SCALE, NO_DRAG, DRAW, ERASE
-} drag= NO_DRAG;
+enum Mode {
+	ROTATE, SHIFT_XY, SHIFT_Z, SCALE, NO_DRAG, DRAW, ERASE
+};
+static Mode drag = NO_DRAG;
 
 static bool showTexture= true;
 static bool textureCorrection= true;
@@ -76,6 +78,8 @@ static GLfloat cameraZMap= 0;
 static GLfloat nearPlane;
 static GLfloat farPlane;
 
+static GLSLShader quadShader;
+
 static Image texture;
 
 static vec3 cursor= vec3(1,0,0);
@@ -88,6 +92,10 @@ void Common::loadShaders(){
   // XXX
 
   // INSERT YOUR CODE HERE
+	quadShader.loadVertexShader("shaders/quad.vert");
+	quadShader.loadFragmentShader("shaders/quad.frag");
+	quadShader.bindVertexAttrib("position", TriMesh::attribVertex);
+	quadShader.link();
 
 
   // END XXX
@@ -195,7 +203,9 @@ void Texture::display(void){
   // display textured full screen quad
   // XXX
 
-  // INSERT YOUR CODE HERE
+  quadShader.bind();
+  texture.bind();
+  quad.draw();
 
   // END XXX
 
@@ -214,7 +224,7 @@ void Texture::mouseDragged(int x, int y){
   // paint on texture
   // XXX
 
-  // INSERT YOUR CODE HERE
+	texture.paint((x/screen.x) * texture.getWidth(), (screen.y - y)/screen.y * texture.getHeight());
 
   // END XXX
 
@@ -429,16 +439,16 @@ void World::display(void){
 
     // INSERT YOUR CODE HERE     
 
-       	  // quadShader.setUniform("lighting", lighting);
-	  // quadShader.setUniform("showTexture", showTexture);
+       quadShader.setUniform("lighting", lighting);
+	   quadShader.setUniform("showTexture", showTexture);
 
-	  // quadShader.setUniform("lightSource.ambient", lightSource.ambient);
-	  // quadShader.setUniform("lightSource.diffuse", lightSource.diffuse);
-	  // quadShader.setUniform("lightSource.specular", lightSource.specular);
-	  // quadShader.setUniform("material.ambient", material.ambient);
-	  // quadShader.setUniform("material.diffuse", material.diffuse);
-	  // quadShader.setUniform("material.specular", material.specular);
-	  // quadShader.setUniform("material.shininess", material.shininess);
+	  /* quadShader.setUniform("lightSource.ambient", lightSource.ambient);
+	   quadShader.setUniform("lightSource.diffuse", lightSource.diffuse);
+	   quadShader.setUniform("lightSource.specular", lightSource.specular);
+	   quadShader.setUniform("material.ambient", material.ambient);
+	   quadShader.setUniform("material.diffuse", material.diffuse);
+	   quadShader.setUniform("material.specular", material.specular);
+	   quadShader.setUniform("material.shininess", material.shininess);*/
 
     // END XXX
 

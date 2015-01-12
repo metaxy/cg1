@@ -40,7 +40,9 @@ public:
   TriMesh();
   
   // constructor, calls loadOff()
-  TriMesh(const std::string& fileName);
+  //TriMesh(const std::string& fileName);
+
+  TriMesh(const std::string& fileName, bool normalize = true);
 
   // destructor
   ~TriMesh();
@@ -110,4 +112,7 @@ protected:
   glm::vec3 boundingBoxMax;
 
   bool textureCorrection;
+
+  int m_numVertices = 0;
+  int m_numPolygons = 0;
 };

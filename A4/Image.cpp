@@ -48,29 +48,34 @@ void Image::generateTexture(){
     // generate texture id
     // XXX
 
-    // INSERT YOUR CODE HERE
+	  glGenTextures(1, &textureID);
 
     // END XXX
   }
 
+  glBindTexture(GL_TEXTURE_2D, textureID);
+
   // texture filtering and repeat
   // XXX
 
-  // INSERT YOUR CODE HERE
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
 
   // END XXX
 
   //enable automatic mipmap generation
   // XXX
 
-  // INSERT YOUR CODE HERE
+  glGenerateMipmap(GL_TEXTURE_2D);
 
   // END XXX
 
   // upload texture data
   // XXX
 
-  // INSERT YOUR CODE HERE
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, &data[0]);
 
   // END XXX
 }
@@ -80,8 +85,8 @@ void Image::setMinFilter(GLuint min){
 
   // set texture parameter
   // XXX
-
-  // INSERT YOUR CODE HERE
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min);
 
   // END XXX
 }
@@ -95,7 +100,8 @@ void Image::setMagFilter(GLuint mag){
   // set texture parameter
   // XXX
 
-  // INSERT YOUR CODE HERE
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag);
 
   // END XXX
 }
@@ -109,7 +115,8 @@ void Image::setWrapS(GLuint wrap){
   // set texture filter
   // XXX
 
-  // INSERT YOUR CODE HERE
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
 
   // END XXX
 }
@@ -123,7 +130,8 @@ void Image::setWrapT(GLuint wrap){
   // set texture filter
   // XXX
 
-  // INSERT YOUR CODE HERE
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
   
   // END XXX
 }
@@ -139,7 +147,8 @@ void Image::setWrap(GLuint wrap){
 void Image::bind(){
   // bind texture
   // XXX
-   // INSERT YOUR CODE HERE
+  
+	glBindTexture(GL_TEXTURE_2D, textureID);
 
   // END XXX
 }
@@ -149,7 +158,7 @@ void Image::bind(){
 void Image::unbind(){
   // XXX
   
-  // INSERT YOUR CODE HERE
+	glBindTexture(GL_TEXTURE_2D, 0);
 
   // END XXX
 }
@@ -160,8 +169,7 @@ vec4 Image::get(unsigned int x, unsigned int y){
   
   // XXX
   
-  // INSERT YOUR CODE HERE 
-  return vec4(0);
+	return data[y*width + x];
   
   // END XXX
 }
@@ -170,8 +178,10 @@ vec4 Image::get(unsigned int x, unsigned int y){
 // XXX: NEEDS TO BE IMPLEMENTED
 void Image::paint(float x, float y){
   // XXX
-  
+	vec4 color(1.f, 0.f, 0.627f, 1.f);
   // INSERT YOUR CODE HERE
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
   
   // END XXX
 }
@@ -181,7 +191,10 @@ void Image::paint(float x, float y){
 void Image::erase(float x, float y){
   // XXX
   
-  // INSERT YOUR CODE HERE
+	vec4 color = this->get(x, y);
+	// INSERT YOUR CODE HERE
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
   
   // END XXX
 }
