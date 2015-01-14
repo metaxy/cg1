@@ -204,8 +204,11 @@ void Texture::display(void){
   // XXX
 
   quadShader.bind();
+  quadShader.setUniform("modelViewProjection", glm::mat4x4());
   texture.bind();
   quad.draw();
+  texture.unbind();
+  quadShader.unbind();
 
   // END XXX
 
@@ -441,6 +444,13 @@ void World::display(void){
 
        quadShader.setUniform("lighting", lighting);
 	   quadShader.setUniform("showTexture", showTexture);
+
+	   quadShader.bind();
+	   quadShader.setUniform("modelViewProjection", cameraMatrix);
+	   texture.bind();
+	   quad.draw();
+	   texture.unbind();
+	   quadShader.unbind();
 
 	  /* quadShader.setUniform("lightSource.ambient", lightSource.ambient);
 	   quadShader.setUniform("lightSource.diffuse", lightSource.diffuse);
