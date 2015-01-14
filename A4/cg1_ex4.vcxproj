@@ -27,6 +27,9 @@
     <ClInclude Include="Window.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\blinnPhongReflection" />
+    <None Include="shaders\phong.frag" />
+    <None Include="shaders\phong.vert" />
     <None Include="shaders\quad.frag" />
     <None Include="shaders\quad.vert" />
   </ItemGroup>

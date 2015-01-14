@@ -28,5 +28,14 @@
     <None Include="shaders\quad.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\phong.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\phong.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\blinnPhongReflection">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

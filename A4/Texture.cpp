@@ -36,6 +36,8 @@
 using namespace glm;
 using namespace std;
 
+
+
 static TriMesh mesh;
 // full screen quad
 static TriMesh quad("data/quad.off", false); // do not center and unitize
@@ -63,6 +65,7 @@ static GLuint modulation= GL_MODULATE;
 static GLuint wrap= GL_CLAMP_TO_BORDER;
 
 static mat4 cameraMatrix;
+static mat4 projectionMatrix;
 static mat4 rotation= mat4(1); // current rotation of object
 static vec3 shift= vec3(0); // offset
 static float scaling= 1; // scale
@@ -86,7 +89,7 @@ static vec3 cursor= vec3(1,0,0);
 
 /*************************************************************************************/
 
-// load Shaders
+// load Shadersplane.off
 // XXX: NEEDS TO BE IMPLEMENTED
 void Common::loadShaders(){
   // XXX
@@ -94,7 +97,9 @@ void Common::loadShaders(){
   // INSERT YOUR CODE HERE
 	quadShader.loadVertexShader("shaders/quad.vert");
 	quadShader.loadFragmentShader("shaders/quad.frag");
+	quadShader.loadFragmentShader("shaders/blinnPhongReflection");
 	quadShader.bindVertexAttrib("position", TriMesh::attribVertex);
+	quadShader.bindVertexAttrib("normal", TriMesh::attribNormal);
 	quadShader.link();
 
 
@@ -204,6 +209,8 @@ void Texture::display(void){
   // XXX
 
   quadShader.bind();
+  quadShader.setUniform("showTexture", true);
+  quadShader.setUniform("lighting", false);
   quadShader.setUniform("modelViewProjection", glm::mat4x4());
   texture.bind();
   quad.draw();
@@ -269,8 +276,8 @@ void Texture::menu(int value){
   case 16:
     texture.load(textures[value]);
     texture.generateTexture();
-    if(value<6) environmentMapping= false;
-    else if(value<13) environmentMapping= true;
+    //if(value<6) environmentMapping= false;
+    //else if(value<13) environmentMapping= true;
     break;
   case 17:
     drag= DRAW;
@@ -305,7 +312,7 @@ string World::menuText[]= {"    reset", "MODEL", "    Plane", "    Spiky Sphere"
 
 int World::numOptions= sizeof(World::menuOptions)/sizeof(World::menuOptions[0]);
 
-static string models[]= {"", "data/plane.off", "data/4cow.off", "data/auto3.off", "data/bunny2.off", "data/cone.off", "data/cow.off", "data/cowboyhut.off", "data/MEGADRACHE.off", "data/Schachfigur.off", "data/tempel.off", "data/tasse.off", "data/spaceshuttle.off", "data/sphere.off"};
+static string models[]= {"", "data/quad.off", "data/4cow.off", "data/auto3.off", "data/bunny2.off", "data/cone.off", "data/cow.off", "data/cowboyhut.off", "data/MEGADRACHE.off", "data/Schachfigur.off", "data/tempel.off", "data/tasse.off", "data/spaceshuttle.off", "data/sphere.off"};
 
 
 vec2 World::previousMouse;
@@ -330,6 +337,7 @@ void World::reshape(int width, int height){
     //position the camera at (0,0,cameraZ) looking down the
     //negative z-axis at (0,0,0)
     cameraMatrix= lookAt(vec3(0.0, 0.0, cameraZ), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+	projectionMatrix = glm::perspectiveFov<float>(fov, width, height, nearPlane, farPlane);
 
     screen= vec2(width, height);
 }
@@ -442,23 +450,23 @@ void World::display(void){
 
     // INSERT YOUR CODE HERE     
 
-       quadShader.setUniform("lighting", lighting);
-	   quadShader.setUniform("showTexture", showTexture);
-
 	   quadShader.bind();
-	   quadShader.setUniform("modelViewProjection", cameraMatrix);
+	   quadShader.setUniform("lighting", lighting);
+	   quadShader.setUniform("showTexture", showTexture);
+	   quadShader.setUniform("modelViewProjection", modelMatrix);
+	   quadShader.setUniform("lightSource.ambient", Context::lightSource.ambient);
+	   quadShader.setUniform("lightSource.diffuse", Context::lightSource.diffuse);
+	   quadShader.setUniform("lightSource.specular", Context::lightSource.specular);
+	   quadShader.setUniform("material.ambient", Context::material.ambient);
+	   quadShader.setUniform("material.diffuse", Context::material.diffuse);
+	   quadShader.setUniform("material.specular", Context::material.specular);
+	   quadShader.setUniform("material.shininess", Context::material.shininess);
 	   texture.bind();
-	   quad.draw();
+	   mesh.draw();
 	   texture.unbind();
 	   quadShader.unbind();
 
-	  /* quadShader.setUniform("lightSource.ambient", lightSource.ambient);
-	   quadShader.setUniform("lightSource.diffuse", lightSource.diffuse);
-	   quadShader.setUniform("lightSource.specular", lightSource.specular);
-	   quadShader.setUniform("material.ambient", material.ambient);
-	   quadShader.setUniform("material.diffuse", material.diffuse);
-	   quadShader.setUniform("material.specular", material.specular);
-	   quadShader.setUniform("material.shininess", material.shininess);*/
+	  
 
     // END XXX
 
@@ -563,6 +571,10 @@ void World::menu(int value){
   case 1:
     // load rectangle
     mesh.loadOff(models[value]);
+	mesh.center();
+	mesh.unitize();
+	mesh.computeNormals();
+	mesh.computeSphereUVs();
     drawRect= true;
     break;
   case 2:
@@ -605,7 +617,7 @@ void World::menu(int value){
     break;
 
   case 19:
-    textureCorrection= !textureCorrection;
+    //textureCorrection= !textureCorrection;
     // enable/disable texture correction in Image (not obligatory, but useful for debugging)
     textureCorrection= !textureCorrection;
     mesh.correctTexture(textureCorrection);

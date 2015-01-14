@@ -22,7 +22,32 @@
 #endif
 
 namespace Context{
+	struct LightSource {
+		//position in view space
+		glm::vec4 position;
+		// ambient color
+		glm::vec4 ambient;
+		// diffuse color
+		glm::vec4 diffuse;
+		// specular color
+		glm::vec4 specular;
+	};
 
+	struct Material {
+		// ambient color
+		glm::vec4 ambient;
+		// diffuse color
+		glm::vec4 diffuse;
+		// specular color
+		glm::vec4 specular;
+		// shininess
+		float shininess;
+	};
+
+	extern LightSource lightSource;
+	extern Material material;
+	void setLighting();
+	void setMaterial();
   // intialization                                             
   void init(int argc, char **argv);  
   

@@ -34,6 +34,28 @@ static const string title= "cg1 assignment 4 - texturing";
 // windows
 static Window mainWindow, textureWindow, worldWindow;
 
+
+
+// light
+Context::LightSource Context::lightSource;
+
+void Context::setLighting() {
+	lightSource.position = vec4(0, 0, 0, 1);
+	lightSource.ambient = vec4(0.1, 0.1, 0.1, 1);
+	lightSource.diffuse = vec4(1, 1, 1, 1);
+	lightSource.specular = vec4(1, 1, 1, 1);
+}
+
+// material
+Context::Material Context::material;
+
+void Context::setMaterial() {
+	material.ambient = vec4(1, 1, 1, 1);
+	material.diffuse = vec4(1, 1, 1, 1);
+	material.specular = vec4(1, 1, 1, 1);
+	material.shininess = 50;
+}
+
 // display callback for GLUT
 static void display(void){
 
@@ -111,6 +133,8 @@ static void createWindows(void){
 // initialize OpenGL context
 // XXX: NEEDS TO BE IMPLEMENTED
 void Context::init(int argc, char **argv){
+	setLighting();
+	setMaterial();
 
   // create window with glut
   glutInit(&argc, argv);

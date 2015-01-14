@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "glm\glm\gtc\constants.hpp"
 
 // use this with care
 // might cause name collisions
@@ -113,7 +114,7 @@ void TriMesh::calculateBoundingBox(void){
 }
 
 void TriMesh::correctTexture(bool correct){
-  textureCorrection= correct;
+  textureCorrection = correct;
 }
 
 // load triangle mesh in OFF format
@@ -123,6 +124,8 @@ void TriMesh::reload(){
 
 // load triangle mesh in .OFF format
 void TriMesh::loadOff(const string& fileName){
+	name = fileName;
+
 	// Clear all lists and buffers
 	positions.clear();
 	normals.clear();
@@ -144,6 +147,9 @@ void TriMesh::loadOff(const string& fileName){
 
 	// Read the file line by line
 	while(getline(inStream, line)) {
+		if(line.empty()) {
+			continue;
+		}
 		if(lineNumber == 0) {
 			// First line has to be "Off"
 			if(line != "OFF") {
@@ -215,7 +221,21 @@ void TriMesh::computeNormals(void){
 
   // Compute uv coordinates with a spherical mapping
   // (vertices are projected on a sphere along the normal and classical sphere uv unwrap is used)
-void TriMesh::computeSphereUVs(void){}
+void TriMesh::computeSphereUVs(void){
+	glm::vec3 m;
+
+	for(vec3 v : positions) {
+		m += v;
+	}
+	m /= positions.size();
+
+	for(vec3 v : positions) {
+		vec3 d = glm::normalize(v - m);
+		double u = 0.5 + atan2(d.z, d.x) / (2. * glm::pi<double>());
+		double v = 0.5 - asin(d.y) / glm::pi<double>();
+		texcoords.push_back(vec3(u, v, 1.f));
+	}
+}
 
 // draw the mesh using vertex arrays
 void TriMesh::draw(void){

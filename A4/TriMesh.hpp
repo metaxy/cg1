@@ -97,9 +97,9 @@ protected:
   std::vector<glm::vec3> positions;
   // normals of the vertices
   std::vector<glm::vec3> normals;
+  std::vector<glm::vec3> texcoords;
   // indices of the faces
   // texture coordinates of the vertices
-  std::vector<glm::vec2> texCoords;
   std::vector<glm::uvec3> faces;
 
   PolygonWinding winding;
