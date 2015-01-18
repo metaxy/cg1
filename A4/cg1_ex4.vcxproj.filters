@@ -15,6 +15,8 @@
     <ClInclude Include="GLSLShader.hpp" />
     <ClInclude Include="TriMesh.hpp" />
     <ClInclude Include="Window.hpp" />
+    <ClInclude Include="Light.hpp" />
+    <ClInclude Include="Material.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
@@ -22,19 +24,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\blinnPhongReflection">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\flatQuad.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\flatQuad.vert">
+      <Filter>Shaders</Filter>
+    </None>
     <None Include="shaders\quad.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\quad.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\phong.vert">
+    <None Include="shaders\texturing.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\phong.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\blinnPhongReflection">
+    <None Include="shaders\texturing.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

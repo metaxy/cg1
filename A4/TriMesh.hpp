@@ -26,8 +26,8 @@
 
 // OpenGL mathematics library
 // http://glm.g-truc.net
-#include "glm\glm/glm.hpp"
-#include "glm\glm/gtx/unsigned_int.hpp"
+#include "glm/glm/glm.hpp"
+#include "glm/glm/gtx/unsigned_int.hpp"
 
 /*
  * Class for a simple triangle mesh represented as an indexed face set
@@ -40,8 +40,6 @@ public:
   TriMesh();
   
   // constructor, calls loadOff()
-  //TriMesh(const std::string& fileName);
-
   TriMesh(const std::string& fileName, bool normalize = true);
 
   // destructor
@@ -97,9 +95,9 @@ protected:
   std::vector<glm::vec3> positions;
   // normals of the vertices
   std::vector<glm::vec3> normals;
-  std::vector<glm::vec3> texcoords;
   // indices of the faces
   // texture coordinates of the vertices
+  std::vector<glm::vec2> texCoords;
   std::vector<glm::uvec3> faces;
 
   PolygonWinding winding;
@@ -112,7 +110,4 @@ protected:
   glm::vec3 boundingBoxMax;
 
   bool textureCorrection;
-
-  int m_numVertices = 0;
-  int m_numPolygons = 0;
 };

@@ -14,6 +14,8 @@
 
 #include "glm/glm/glm.hpp"
 
+struct Light;
+struct Material;
 
 namespace Common{
 
@@ -44,9 +46,15 @@ namespace World{
   extern int numOptions;
   extern glm::vec2 previousMouse; // previous mouse position
   
+  extern Light lightSource;
+  extern Material material;
+
   void display(void);
   void reshape(int width, int height);
   void mousePressed(int button, int state, int x, int y);
   void mouseDragged(int x, int y);
   void menu(int value);
+
+  void setupLight();
+  void setupMaterial();
 };

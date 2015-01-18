@@ -10,6 +10,8 @@
 
 #include "GLSLShader.hpp"
 
+#include <stdint.h>
+
 using namespace std;
 
 GLSLShader::GLSLShader(){
@@ -20,12 +22,11 @@ GLSLShader::GLSLShader(){
 
 
 GLSLShader::~GLSLShader(){
-
-  for(int i= 0; i<vertexShaders.size(); i++)
+  for(uint32_t i= 0; i<vertexShaders.size(); i++)
     glDeleteShader(vertexShaders[i]);
-  for(int i= 0; i<geometryShaders.size(); i++)
+  for(uint32_t i = 0; i<geometryShaders.size(); i++)
     glDeleteShader(geometryShaders[i]);
-  for(int i= 0; i<fragmentShaders.size(); i++)
+  for(uint32_t i = 0; i<fragmentShaders.size(); i++)
     glDeleteShader(fragmentShaders[i]);
   glDeleteProgram(program);
 }

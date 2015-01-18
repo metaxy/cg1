@@ -22,16 +22,20 @@
     <ClInclude Include="Context.hpp" />
     <ClInclude Include="GLSLShader.hpp" />
     <ClInclude Include="Image.hpp" />
+    <ClInclude Include="Light.hpp" />
+    <ClInclude Include="Material.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="TriMesh.hpp" />
     <ClInclude Include="Window.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\blinnPhongReflection" />
-    <None Include="shaders\phong.frag" />
-    <None Include="shaders\phong.vert" />
+    <None Include="shaders\flatQuad.frag" />
+    <None Include="shaders\flatQuad.vert" />
     <None Include="shaders\quad.frag" />
     <None Include="shaders\quad.vert" />
+    <None Include="shaders\texturing.frag" />
+    <None Include="shaders\texturing.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>Win32Proj</Keyword>
@@ -75,6 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -83,6 +88,9 @@
       <AdditionalLibraryDirectories>./win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>freeglut.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
