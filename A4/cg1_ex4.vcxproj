@@ -34,6 +34,8 @@
     <None Include="shaders\flatQuad.vert" />
     <None Include="shaders\quad.frag" />
     <None Include="shaders\quad.vert" />
+    <None Include="shaders\sphereMap.frag" />
+    <None Include="shaders\sphereMap.vert" />
     <None Include="shaders\texturing.frag" />
     <None Include="shaders\texturing.vert" />
   </ItemGroup>

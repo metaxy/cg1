@@ -200,7 +200,6 @@ void Image::paint(float x, float y) {
 
 
 void Image::erase(float x, float y) {
-	
 	bind(); 
 	vec4 color = get(x, y);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, 1, 1, GL_RGBA, GL_FLOAT, &color);

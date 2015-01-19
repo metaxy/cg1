@@ -21,11 +21,13 @@
 
 #include <string>
 #include <iostream>
+#include <math.h>
 
 #include "glm/glm/glm.hpp"
 #define GLM_FORCE_RADIANS
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/matrix_inverse.hpp"
+#include "glm\glm\gtc\constants.hpp"
 
 #include "Context.hpp"
 #include "Texture.hpp"
@@ -87,6 +89,7 @@ static vec3 cursor = vec3(1, 0, 0);
 static GLSLShader flatQuadShader;
 static GLSLShader quadShader;
 static GLSLShader texturingShader;
+static GLSLShader sphereMapShader;
 
 /*************************************************************************************/
 
@@ -115,6 +118,14 @@ void Common::loadShaders() {
 	texturingShader.bindVertexAttrib("texcoord", TriMesh::attribTexCoord);
 	texturingShader.link();
 
+	sphereMapShader.loadVertexShader("shaders/sphereMap.vert");
+	sphereMapShader.loadFragmentShader("shaders/sphereMap.frag");
+	sphereMapShader.loadFragmentShader("shaders/blinnPhongReflection");
+	sphereMapShader.bindVertexAttrib("position", TriMesh::attribVertex);
+	sphereMapShader.bindVertexAttrib("normal", TriMesh::attribNormal);
+	sphereMapShader.bindVertexAttrib("texcoord", TriMesh::attribTexCoord);
+	sphereMapShader.link();
+
 	// END XXX
 }
 
@@ -126,8 +137,20 @@ static void updateCursor(int x, int y) {
 	// XXX
 
 	// INSERT YOUR CODE HERE
-
-
+	float u = x/screen.x;
+	float v = 1 - y/screen.y;
+	float ny = cos((1.f - v) * glm::pi<float>());
+	float theta = (u - 0.5f) * (2 * glm::pi<float>());
+	float nx = sin(theta);
+	float nz = cos(theta);
+	double l = glm::sqrt((1.f * 1.f - ny * ny) / (nx * nx + nz * nz));
+	
+	cursor = vec3(l*nx, ny, l*nz);
+	/*cout << "(" << nx << ", " << ny << ", " << nz << ")" << endl;*/
+	
+	/*float v_old = 1.f - acos(ny) / glm::pi<float>();
+	float u_old = 0.5f + atan2(nz, nx) / (2 * glm::pi<float>());
+	cout << u << " " << v << " vs " << u_old << " " << v_old << endl;*/
 	// END XXX
 }
 
@@ -238,12 +261,12 @@ void Texture::mousePressed(int button, int state, int x, int y) {
 // mouse dragged callback
 // XXX: NEEDS TO BE IMPLEMENTED
 void Texture::mouseDragged(int x, int y) {
-	if(drag == DragMode::DRAW) { 
+	if(drag == DragMode::DRAW) {
 		texture.paint((x / screen.x) * texture.getWidth(), ((screen.y - y) / screen.y) * texture.getHeight());
 	} else {
 		texture.erase((x / screen.x) * texture.getWidth(), ((screen.y - y) / screen.y) * texture.getHeight());
 	}
-	
+
 
 	updateCursor(x, y);
 
@@ -299,19 +322,19 @@ void Texture::menu(int value) {
 		// INSERT YOUR CODE HERE
 		case 19:
 		texture.setMagFilter(GL_NEAREST);
-		break; 
+		break;
 		case 20:
 		texture.setMagFilter(GL_LINEAR);
 		break;
 		case 21:
 		texture.setMinFilter(GL_NEAREST);
-		break; 
+		break;
 		case 22:
 		texture.setMinFilter(GL_LINEAR);
-		break; 
+		break;
 		case 23:
 		texture.setMinFilter(GL_NEAREST_MIPMAP_NEAREST);
-		break; 
+		break;
 		case 24:
 		texture.setMinFilter(GL_LINEAR_MIPMAP_NEAREST);
 		break;
@@ -424,6 +447,11 @@ void World::display(void) {
 	// XXX
 
 	// INSERT YOUR CODE HERE
+	glBegin(GL_LINES);
+	glColor3ub(255, 255, 0);
+	glVertex3f(0.0, 0.0, 0.0);
+	glVertex3f(cursor.x * 2.f, cursor.y * 2.f, cursor.z * 2.f);
+	glEnd();
 
 	// END XXX
 
@@ -465,7 +493,7 @@ void World::display(void) {
 
 		// sphereMapShader.setUniform("lighting", lighting);
 		// sphereMapShader.setUniform("showTexture", showTexture);
-		// sphereMapShader.setUniform("moveEnvironment", moveEnvironment);
+		
 
 		// sphereMapShader.setUniform("lightSource.ambient", lightSource.ambient);
 		// sphereMapShader.setUniform("lightSource.diffuse", lightSource.diffuse);
@@ -474,6 +502,35 @@ void World::display(void) {
 		// sphereMapShader.setUniform("material.diffuse", material.diffuse);
 		// sphereMapShader.setUniform("material.specular", material.specular);
 		// sphereMapShader.setUniform("material.shininess", material.shininess);
+
+		sphereMapShader.bind();
+		sphereMapShader.setUniform("modelView", cameraMatrix * modelMatrix);
+		sphereMapShader.setUniform("normalMatrix", glm::transpose(glm::inverse(cameraMatrix * modelMatrix)));
+		sphereMapShader.setUniform("modelViewProjection", projectionMatrix * cameraMatrix * modelMatrix);
+		
+		sphereMapShader.setUniform("mirrorMatrix", mirrorMatrix);
+		sphereMapShader.setUniform("mirrorNormalMatrix", glm::transpose(glm::inverse(mirrorMatrix)));
+		
+		sphereMapShader.setUniform("viewMatrix", cameraMatrix);
+		sphereMapShader.setUniform("viewNormalMatrix", glm::transpose(glm::inverse(cameraMatrix)));
+		sphereMapShader.setUniform("viewProjectionMatrix", projectionMatrix * cameraMatrix);
+
+		sphereMapShader.setUniform("lighting", lighting);
+		sphereMapShader.setUniform("showTexture", showTexture);
+		sphereMapShader.setUniform("moveEnvironment", moveEnvironment);
+
+		sphereMapShader.setUniform("lightSource.position", lightSource.position);
+		sphereMapShader.setUniform("lightSource.ambient", lightSource.ambient);
+		sphereMapShader.setUniform("lightSource.diffuse", lightSource.diffuse);
+		sphereMapShader.setUniform("lightSource.specular", lightSource.specular);
+		sphereMapShader.setUniform("material.ambient", material.ambient);
+		sphereMapShader.setUniform("material.diffuse", material.diffuse);
+		sphereMapShader.setUniform("material.specular", material.specular);
+		sphereMapShader.setUniform("material.shininess", material.shininess);
+		texture.bind();
+		mesh.draw();
+		texture.unbind();
+		sphereMapShader.unbind();
 
 		// END XXX
 	}

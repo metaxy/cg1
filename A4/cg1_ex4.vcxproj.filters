@@ -45,5 +45,11 @@
     <None Include="shaders\texturing.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shaders\sphereMap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\sphereMap.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
