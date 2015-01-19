@@ -64,6 +64,13 @@ public:
   // erase drawing from texture
   void erase(float x, float y);
 
+  inline int getWidth() const {
+	  return width;
+  }
+  inline int getHeight() const {
+	  return height;
+  }
+
 protected:
 
   // image data

@@ -177,12 +177,8 @@ void Image::unbind() {
 // XXX: NEEDS TO BE IMPLEMENTED
 vec4 Image::get(unsigned int x, unsigned int y) {
 
-	// XXX
+	return data[x + y*this->getWidth()];
 
-	// INSERT YOUR CODE HERE 
-	return vec4(0);
-
-	// END XXX
 }
 
 // draw in texture
@@ -191,18 +187,32 @@ void Image::paint(float x, float y) {
 	// XXX
 
 	// INSERT YOUR CODE HERE
-
+	vec4 color(1.0f, 0.f, 0.627f, 0.9f);
+	bind();
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x - 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y - 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x + 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y + 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	unbind();
 	// END XXX
 }
 
-// erase drawing from texture
-// XXX: NEEDS TO BE IMPLEMENTED
+
 void Image::erase(float x, float y) {
-	// XXX
-
-	// INSERT YOUR CODE HERE
-
-	// END XXX
+	
+	bind(); 
+	vec4 color = get(x, y);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	color = get(x - 1, y);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x - 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	color = get(x, y - 1);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y - 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	color = get(x + 1, y);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x + 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	color = get(x, y + 1);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y + 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
+	unbind();
 }
 
 void Image::load(const std::string& filename) {

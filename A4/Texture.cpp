@@ -238,13 +238,12 @@ void Texture::mousePressed(int button, int state, int x, int y) {
 // mouse dragged callback
 // XXX: NEEDS TO BE IMPLEMENTED
 void Texture::mouseDragged(int x, int y) {
-
-	// paint on texture
-	// XXX
-
-	// INSERT YOUR CODE HERE
-
-	// END XXX
+	if(drag == DragMode::DRAW) { 
+		texture.paint((x / screen.x) * texture.getWidth(), ((screen.y - y) / screen.y) * texture.getHeight());
+	} else {
+		texture.erase((x / screen.x) * texture.getWidth(), ((screen.y - y) / screen.y) * texture.getHeight());
+	}
+	
 
 	updateCursor(x, y);
 

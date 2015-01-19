@@ -188,17 +188,11 @@ void TriMesh::computeNormals(void) {
 	// Calculate the normals for all faces
 	for(uvec3 face : faces) {
 		faceNormals.push_back(
-			(winding == PolygonWinding::CW) ?
 			glm::normalize(glm::cross(
 			(positions[face.y] - positions[face.x]),
 			(positions[face.z] - positions[face.x])
 			))
-			:
-			glm::normalize(glm::cross(
-			(positions[face.z] - positions[face.x]),
-			(positions[face.y] - positions[face.x])
-			))
-			);
+		);
 	}
 
 	// Iterate over all vertices
