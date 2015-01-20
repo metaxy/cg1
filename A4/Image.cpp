@@ -176,9 +176,7 @@ void Image::unbind() {
 // read a pixel from image
 // XXX: NEEDS TO BE IMPLEMENTED
 vec4 Image::get(unsigned int x, unsigned int y) {
-
 	return data[x + y*this->getWidth()];
-
 }
 
 // draw in texture
