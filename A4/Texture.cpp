@@ -64,7 +64,7 @@ static bool drawMesh = true;
 static bool drawRect = false;
 
 static GLuint modulation = GL_MODULATE;
-static GLuint wrap = GL_CLAMP_TO_BORDER;
+static GLuint wrap = GL_REPEAT;
 
 static mat4 cameraMatrix;
 static mat4 rotation = mat4(1); // current rotation of object
@@ -712,7 +712,6 @@ void World::menu(int value) {
 		break;
 
 		case 19:
-		textureCorrection = !textureCorrection;
 		// enable/disable texture correction in Image (not obligatory, but useful for debugging)
 		textureCorrection = !textureCorrection;
 		mesh.correctTexture(textureCorrection);
@@ -724,8 +723,11 @@ void World::menu(int value) {
 		break;
 		case 20:
 		// set texture wrapping in Image (not obligatory, but useful for debugging)
-		if(wrap == GL_REPEAT) wrap = GL_CLAMP_TO_BORDER;
-		else wrap = GL_REPEAT;
+		if(wrap == GL_REPEAT) {
+			wrap = GL_CLAMP_TO_BORDER;
+		} else {
+			wrap = GL_REPEAT;
+		}
 		texture.setWrap(wrap);
 		break;
 		break;

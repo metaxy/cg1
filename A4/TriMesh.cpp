@@ -29,6 +29,10 @@ const GLuint TriMesh::attribNormal = 2;
 const GLuint TriMesh::attribColor = 3;
 const GLuint TriMesh::attribTexCoord = 8;
 
+enum VertexType {
+	UNKNOWN, LEFT, RIGHT
+};
+
 TriMesh::TriMesh() {
 	winding = CW;
 }
@@ -167,19 +171,20 @@ void TriMesh::loadOff(const string& fileName) {
 				stringstream sStream(line);
 				sStream >> i >> a >> b >> c;
 
-				if(winding == PolygonWinding::CW) {
-					faces.push_back(glm::uvec3(a, b, c));
-				} else {
-					faces.push_back(glm::uvec3(c, b, a));
+				if(winding == PolygonWinding::CCW) {
+					// Swap a and c face index
+					i = a;
+					a = c;
+					c = i;
 				}
 
+				faces.push_back(glm::uvec3(a, b, c));
 			}
 		}
 
 		lineNumber++;
 	}
 }
-
 
 // calculate smooth per-vertex normals
 void TriMesh::computeNormals(void) {
@@ -228,6 +233,97 @@ void TriMesh::computeSphereUVs(void) {
 		texCoords.push_back(vec2(u, v));
 
 		++id;
+	}
+
+	if(!textureCorrection)
+		return;
+
+	// Get the seam faces
+	for(int f = 0; f < faces.size(); ++f) {
+		// Get the normals of all vertices
+		vec3 n1 = normals[faces[f].x];
+		vec3 n2 = normals[faces[f].y];
+		vec3 n3 = normals[faces[f].z];
+
+		// Project normals to x-z plane
+		n1.y = 0;
+		n2.y = 0;
+		n3.y = 0;
+
+		VertexType t1 = VertexType::UNKNOWN;
+		VertexType t2 = VertexType::UNKNOWN;
+		VertexType t3 = VertexType::UNKNOWN;
+
+		// ASSUMPTION: Normals are nearly the same (we have a continuum surface)
+		// Calculate their position (left or right of the seam looking down positive z axis)
+		if(n1.z < 0.f && n2.z < 0.f && n3.z < 0.f) {
+			t1 = (n1.x >= 0.f) ? VertexType::LEFT : VertexType::RIGHT;
+			t2 = (n2.x >= 0.f) ? VertexType::LEFT : VertexType::RIGHT;
+			t3 = (n3.x >= 0.f) ? VertexType::LEFT : VertexType::RIGHT;
+		}
+
+		if((t1 == VertexType::UNKNOWN && t2 == VertexType::UNKNOWN && t3 == VertexType::UNKNOWN) ||
+		   (t1 == VertexType::LEFT && t2 == VertexType::LEFT && t3 == VertexType::LEFT) ||
+		   (t1 == VertexType::RIGHT && t2 == VertexType::RIGHT && t3 == VertexType::RIGHT)) {
+			// All have the same vertex type
+			continue;
+		}
+
+		int a = faces[f].x;
+		int b = faces[f].y;
+		int c = faces[f].z;
+
+		if(t1 == VertexType::RIGHT) {
+			int vid = positions.size();
+
+			// Copy the vertex with index a
+			positions.push_back(positions[a]);
+			normals.push_back(normals[a]);
+
+			// Assign the right texture coordinates
+			vec2 uv;
+			uv.x = 1.f + texCoords[a].x;
+			uv.y = texCoords[a].y;
+			texCoords.push_back(uv);
+
+			// Set the new face index
+			a = vid;
+		}
+		if(t2 == VertexType::RIGHT) {
+			int vid = positions.size();
+
+			// Copy the vertex with index a
+			positions.push_back(positions[b]);
+			normals.push_back(normals[b]);
+
+			// Assign the right texture coordinates
+			vec2 uv;
+			uv.x = 1.f + texCoords[b].x;
+			uv.y = texCoords[b].y;
+			texCoords.push_back(uv);
+
+			// Set the new face index
+			b = vid;
+		}
+		if(t3 == VertexType::RIGHT) {
+			int vid = positions.size();
+
+			// Copy the vertex with index a
+			positions.push_back(positions[c]);
+			normals.push_back(normals[c]);
+
+			// Assign the right texture coordinates
+			vec2 uv;
+			uv.x = 1.f + texCoords[c].x;
+			uv.y = texCoords[c].y;
+			texCoords.push_back(uv);
+
+			// Set the new face index
+			c = vid;
+		}
+
+		// Alter the face
+		faces[f] = uvec3(a, b, c);
 	}
 }
 

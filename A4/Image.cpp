@@ -19,7 +19,7 @@
 using namespace std;
 using namespace glm;
 
-Image::Image() : width(0), height(0), wrapS(GL_CLAMP_TO_BORDER), min(GL_LINEAR), mag(GL_LINEAR), textureID(0) {
+Image::Image() : width(0), height(0), wrapS(GL_REPEAT), min(GL_LINEAR), mag(GL_LINEAR), textureID(0) {
 }
 
 Image::Image(int width, int height)
