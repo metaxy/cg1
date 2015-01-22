@@ -346,6 +346,17 @@ void Texture::menu(int value) {
 		break;
 
 		// END XXX
+
+		case 27:
+		texture.load("data/silhouette_narrow.ppm");
+		texture.generateTexture();
+		environmentMapping = true;
+		break;
+		case 28:
+		texture.load("data/silhouette_broad.ppm");
+		texture.generateTexture();
+		environmentMapping = true;
+		break;
 		default:
 		break;
 	}

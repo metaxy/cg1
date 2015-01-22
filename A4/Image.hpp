@@ -26,8 +26,33 @@
 
 #include "glm/glm/glm.hpp"
 
-class Image{
 
+
+class Image{
+	class MipMap {
+	public:
+		inline MipMap(std::vector<glm::vec4> data, int lod, int width, int height) {
+			glGenTextures(1, &textureID);
+			
+			glBindTexture(GL_TEXTURE_2D, textureID);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, &data[0]);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			this->width = width;
+			this->height = height;
+			this->lod = lod;
+			this->data = data;
+		}
+		std::vector<glm::vec4> data;
+		int width;
+		int height;
+		int lod;
+		GLuint textureID;
+	};
 public:
 
   // constructors
