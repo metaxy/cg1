@@ -15,7 +15,7 @@
 #include "glm/glm/glm.hpp"
 
 struct Light;
-struct Material;
+class Material;
 
 namespace Common{
 

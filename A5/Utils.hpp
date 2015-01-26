@@ -4,6 +4,8 @@
 #include "glm\glm\glm.hpp"
 
 #include <math.h>
+#include <string>
+#include <sstream>
 
 template<class S, class T>
 bool intersect(const S& obj1, const T& obj2, glm::vec3* point) {
@@ -58,4 +60,18 @@ bool intersect<Ray, Triangle>(const Ray& obj1, const Triangle& obj2, glm::vec3* 
 	*point = glm::vec3(t, u, v);
 
 	return u > 0 && u < 1 && v > 0 && v < 1 && u + v < 1 && t > 0;
+}
+
+inline std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+	std::stringstream ss(s);
+	std::string item;
+	while(std::getline(ss, item, delim)) {
+		elems.push_back(item);
+	}
+	return elems;
+}
+inline std::vector<std::string> split(const std::string &s, char delim) {
+	std::vector<std::string> elems;
+	split(s, delim, elems);
+	return elems;
 }

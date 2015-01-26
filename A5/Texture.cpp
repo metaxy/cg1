@@ -534,10 +534,10 @@ void World::display(void) {
 		sphereMapShader.setUniform("lightSource.ambient", lightSource.ambient);
 		sphereMapShader.setUniform("lightSource.diffuse", lightSource.diffuse);
 		sphereMapShader.setUniform("lightSource.specular", lightSource.specular);
-		sphereMapShader.setUniform("material.ambient", material.ambient);
-		sphereMapShader.setUniform("material.diffuse", material.diffuse);
-		sphereMapShader.setUniform("material.specular", material.specular);
-		sphereMapShader.setUniform("material.shininess", material.shininess);
+		sphereMapShader.setUniform("material.ambient", material.getAmbient());
+		sphereMapShader.setUniform("material.diffuse", material.getDiffuse());
+		sphereMapShader.setUniform("material.specular", material.getSpecular());
+		sphereMapShader.setUniform("material.shininess", material.getShininess());
 		texture.bind();
 		mesh.draw();
 		texture.unbind();
@@ -562,10 +562,10 @@ void World::display(void) {
 		quadShader.setUniform("lightSource.ambient", lightSource.ambient);
 		quadShader.setUniform("lightSource.diffuse", lightSource.diffuse);
 		quadShader.setUniform("lightSource.specular", lightSource.specular);
-		quadShader.setUniform("material.ambient", material.ambient);
-		quadShader.setUniform("material.diffuse", material.diffuse);
-		quadShader.setUniform("material.specular", material.specular);
-		quadShader.setUniform("material.shininess", material.shininess);
+		quadShader.setUniform("material.ambient", material.getAmbient());
+		quadShader.setUniform("material.diffuse", material.getDiffuse());
+		quadShader.setUniform("material.specular", material.getSpecular());
+		quadShader.setUniform("material.shininess", material.getShininess());
 		texture.bind();
 		mesh.draw();
 		texture.unbind();
@@ -593,10 +593,10 @@ void World::display(void) {
 		texturingShader.setUniform("lightSource.ambient", lightSource.ambient);
 		texturingShader.setUniform("lightSource.diffuse", lightSource.diffuse);
 		texturingShader.setUniform("lightSource.specular", lightSource.specular);
-		texturingShader.setUniform("material.ambient", material.ambient);
-		texturingShader.setUniform("material.diffuse", material.diffuse);
-		texturingShader.setUniform("material.specular", material.specular);
-		texturingShader.setUniform("material.shininess", material.shininess);
+		texturingShader.setUniform("material.ambient", material.getAmbient());
+		texturingShader.setUniform("material.diffuse", material.getDiffuse());
+		texturingShader.setUniform("material.specular", material.getSpecular());
+		texturingShader.setUniform("material.shininess", material.getShininess());
 		texture.bind();
 		mesh.draw();
 		texture.unbind();
@@ -763,8 +763,5 @@ void World::setupLight() {
 	lightSource.specular = glm::vec4(1.f, 1.f, 1.f, 1.f);
 }
 void World::setupMaterial() {
-	material.ambient = vec4(1, 1, 1, 1);
-	material.diffuse = vec4(1, 1, 1, 1);
-	material.specular = vec4(1, 1, 1, 1);
-	material.shininess = 50;
+	material = Material(vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), 50);
 }
