@@ -65,6 +65,7 @@ public:
 
   // load image from file
   void load(const std::string& filename);
+  void load(const std::vector<glm::vec4>& data, int width, int heigth);
 
   // set texture filter
   void setMinFilter(GLuint min);

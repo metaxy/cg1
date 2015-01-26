@@ -213,7 +213,6 @@ void Image::erase(float x, float y) {
 }
 
 void Image::load(const std::string& filename) {
-
 	data.clear();
 
 	if(filename.substr(filename.size() - 4, 4) == ".ppm") loadPPM(filename);
@@ -221,6 +220,13 @@ void Image::load(const std::string& filename) {
 		cerr << "file " << filename << " is not a PPM file" << endl;
 		return;
 	}
+}
+void Image::load(const std::vector<glm::vec4>& data, int width, int heigth) {
+	this->data.clear();
+
+	this->data = data;
+	this->width = width;
+	this->height = height;
 }
 
 void Image::loadPPM(const std::string& filename) {
