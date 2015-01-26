@@ -22,6 +22,8 @@
     <ClInclude Include="BoundingBox.hpp" />
     <ClInclude Include="KDTree.hpp" />
     <ClInclude Include="Triangle.hpp" />
+    <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="Ray.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

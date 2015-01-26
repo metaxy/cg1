@@ -16,28 +16,11 @@ public:
 		// TODO: Implement
 	}
 
-	template<class T>
-	bool intersect(const T& object, glm::vec3* point) {
-		// TODO: Implement
-		return false;
+	glm::vec3 getMin() const {
+		return m_min;
 	}
-	template <>
-	bool intersect<glm::vec3>(const glm::vec3& object, glm::vec3* point) {
-		if(object.x >= m_min.x &&
-		   object.y >= m_min.y &&
-		   object.z >= m_min.z &&
-		   object.x <= m_max.x &&
-		   object.y <= m_max.y &&
-		   object.z <= m_max.z) {
-			*point = object;
-			return true;
-		}
-
-		return false;
-	}
-	template <>
-	bool intersect<BoundingBox>(const BoundingBox& object, glm::vec3* point) {
-
+	glm::vec3 getMax() const {
+		return m_max;
 	}
 
 private:

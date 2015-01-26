@@ -28,9 +28,11 @@
     <ClInclude Include="KDTree.hpp" />
     <ClInclude Include="Light.hpp" />
     <ClInclude Include="Material.hpp" />
+    <ClInclude Include="Ray.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="Triangle.hpp" />
     <ClInclude Include="TriMesh.hpp" />
+    <ClInclude Include="Utils.hpp" />
     <ClInclude Include="Window.hpp" />
   </ItemGroup>
   <ItemGroup>
