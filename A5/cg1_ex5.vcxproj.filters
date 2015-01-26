@@ -9,6 +9,7 @@
     <ClCompile Include="Window.cpp" />
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Triangle.cpp" />
+    <ClCompile Include="KDTree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.hpp" />
@@ -24,6 +25,7 @@
     <ClInclude Include="Triangle.hpp" />
     <ClInclude Include="Utils.hpp" />
     <ClInclude Include="Ray.hpp" />
+    <ClInclude Include="Raytracer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">

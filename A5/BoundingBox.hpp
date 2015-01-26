@@ -1,8 +1,11 @@
 #pragma once
 
+#include <math.h>
 #include <vector>
 
 #include "glm\glm\glm.hpp"
+
+enum Axis {X, Y, Z};
 
 class BoundingBox {
 public:
@@ -21,6 +24,21 @@ public:
 	}
 	glm::vec3 getMax() const {
 		return m_max;
+	}
+	Axis getLongestAxis() const {
+		float dx = m_max.x - m_min.x;
+		float dy = m_max.y - m_min.y;
+		float dz = m_max.z - m_min.z;
+
+		if(dx >= dy && dx >= dz) {
+			return X;
+		}
+		if(dy >= dx && dy >= dz) {
+			return Y;
+		}
+		if(dz >= dx && dz >= dy) {
+			return Z;
+		}
 	}
 
 private:
