@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "Triangle.hpp"
@@ -10,20 +11,18 @@ class KDTree {
 			left = nullptr;
 			right = nullptr;
 		}
-
-		KDNode* left;
-		KDNode* right;
-		std::vector<Triangle> triangles;
+		std::unique_ptr<KDNode> left;
+		std::unique_ptr<KDNode> right;
+		std::vector<Triangle*> triangles;
 		BoundingBox bbox;
 	};
 public:
 	/* Construct a KDTree from triangles in WORLD coordinates */
-	KDTree(const std::vector<Triangle>& triangles);
-
-
-private:
-	KDNode* build(const std::vector<Triangle>& triangles, const int depth);
+	KDTree(const std::vector<Triangle*>& triangles);
 
 private:
-	KDNode* m_head;
+	KDNode* build(const std::vector<Triangle*>& triangles, const int depth);
+
+private:
+	std::unique_ptr<KDNode> m_head;
 };

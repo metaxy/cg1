@@ -10,6 +10,7 @@
     <ClCompile Include="BoundingBox.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="KDTree.cpp" />
+    <ClCompile Include="Raytracer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.hpp" />

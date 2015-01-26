@@ -16,6 +16,7 @@
     <ClCompile Include="GLSLShader.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="KDTree.cpp" />
+    <ClCompile Include="Raytracer.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Triangle.cpp" />
     <ClCompile Include="TriMesh.cpp" />

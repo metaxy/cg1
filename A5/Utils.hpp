@@ -1,5 +1,6 @@
 #include "BoundingBox.hpp"
 #include "Ray.hpp"
+#include "Triangle.hpp"
 #include "glm\glm\glm.hpp"
 
 #include <math.h>
@@ -45,4 +46,16 @@ bool intersect<BoundingBox, Ray>(const BoundingBox& obj1, const Ray& obj2, glm::
 	float imax = std::fminf(xmax, std::fminf(ymax, zmax));
 
 	return imin <= imax;
+}
+template <>
+bool intersect<Ray, Triangle>(const Ray& obj1, const Triangle& obj2, glm::vec3* point) {
+	float det = glm::dot(glm::cross(obj1.getDirection(), obj2.getC() - obj2.getA()), obj2.getB() - obj2.getA());
+	float idet = 1.f / det;
+	float t = idet * glm::dot(glm::cross(obj1.getOrigin() - obj2.getA(), obj2.getB() - obj2.getA()), obj2.getC() - obj2.getA());
+	float u = idet * glm::dot(glm::cross(obj1.getDirection(), obj2.getC() - obj2.getA()), obj1.getOrigin() - obj2.getA());
+	float v = idet * glm::dot(glm::cross(obj1.getOrigin() - obj2.getA(), obj2.getB() - obj2.getA()), obj1.getDirection());
+
+	*point = glm::vec3(t, u, v);
+
+	return u > 0 && u < 1 && v > 0 && v < 1 && u + v < 1 && t > 0;
 }

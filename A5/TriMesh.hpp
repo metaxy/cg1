@@ -33,7 +33,7 @@
  * Class for a simple triangle mesh represented as an indexed face set
  */
 class TriMesh{
-
+	friend class Raytracer;
 public:
 
   // default constructor
