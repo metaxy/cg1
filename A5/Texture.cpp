@@ -38,6 +38,7 @@
 #include "Light.hpp"
 #include "Material.hpp"
 #include "Resources.hpp"
+#include "Raytracer.hpp"
 
 using namespace glm;
 using namespace std;
@@ -87,6 +88,7 @@ static GLfloat nearPlane;
 static GLfloat farPlane;
 
 static Image texture;
+static Image* traceTexture = nullptr;
 
 static vec3 cursor = vec3(1, 0, 0);
 
@@ -94,6 +96,8 @@ static GLSLShader flatQuadShader;
 static GLSLShader quadShader;
 static GLSLShader texturingShader;
 static GLSLShader sphereMapShader;
+
+static Raytracer raytracer;
 
 /*************************************************************************************/
 
@@ -159,17 +163,17 @@ static void updateCursor(int x, int y) {
 	// XXX
 
 	// INSERT YOUR CODE HERE
-	float u = x/screen.x;
-	float v = 1 - y/screen.y;
+	float u = x / screen.x;
+	float v = 1 - y / screen.y;
 	float ny = cos((1.f - v) * glm::pi<float>());
 	float theta = (u - 0.5f) * (2 * glm::pi<float>());
 	float nx = sin(theta);
 	float nz = cos(theta);
 	double l = glm::sqrt((1.f * 1.f - ny * ny) / (nx * nx + nz * nz));
-	
+
 	cursor = vec3(l*nx, ny, l*nz);
 	/*cout << "(" << nx << ", " << ny << ", " << nz << ")" << endl;*/
-	
+
 	/*float v_old = 1.f - acos(ny) / glm::pi<float>();
 	float u_old = 0.5f + atan2(nz, nx) / (2 * glm::pi<float>());
 	cout << u << " " << v << " vs " << u_old << " " << v_old << endl;*/
@@ -266,9 +270,13 @@ void Texture::display(void) {
 
 	// INSERT YOUR CODE HERE
 	flatQuadShader.bind();
-	texture.bind();
+	if(traceTexture != nullptr) {
+		traceTexture->bind();
+	} else {
+		texture.bind();
+	}
 	Resources::Get<TriMesh>(quadPath)->draw();
-//	quad.draw();
+	//	quad.draw();
 	flatQuadShader.unbind();
 	texture.unbind();
 	// END XXX
@@ -393,10 +401,10 @@ void Texture::menu(int value) {
 // -------------------------------------------------------
 
 int World::menuOptions[] = {24, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-0, 15, 16, 17, 18, 19, 20, 21, 22};
+0, 15, 16, 17, 18, 19, 20, 21, 22, 23};
 string World::menuText[] = {"    reset", "MODEL", "    Quad", "    Spiky Sphere", "    Car", "    Bunny", "    Cone", "    Cow", "    Cowboy Hat", "    Dragon", "    Chess", "    Temple", "    Cup", "    Space Shuttle", "    Sphere", "    None",
 "RENDERING", "    Lighting on/off", "    Texture on/off", "    Coordinate System on/off", "    Origin on/off",
-"    Texture Coordinate Correction on/off  ", "    Texture Mode (WRAP/CLAMP) ", "    Environment mapping on/off", "    Move object/environment"};
+"    Texture Coordinate Correction on/off  ", "    Texture Mode (WRAP/CLAMP) ", "    Environment mapping on/off", "    Move object/environment", "    Raytrace"};
 
 int World::numOptions = sizeof(World::menuOptions) / sizeof(World::menuOptions[0]);
 
@@ -496,6 +504,10 @@ void World::display(void) {
 		return;
 	}
 
+	if(raytracer.m_tree) {
+		raytracer.m_tree->Render();
+	}
+
 	// draw the geometry
 	glm::mat4 projectionMatrix;
 	glGetFloatv(GL_PROJECTION_MATRIX, &projectionMatrix[0][0]);
@@ -525,26 +537,14 @@ void World::display(void) {
 
 		// INSERT YOUR CODE HERE
 
-		// sphereMapShader.setUniform("lighting", lighting);
-		// sphereMapShader.setUniform("showTexture", showTexture);
-		
-
-		// sphereMapShader.setUniform("lightSource.ambient", lightSource.ambient);
-		// sphereMapShader.setUniform("lightSource.diffuse", lightSource.diffuse);
-		// sphereMapShader.setUniform("lightSource.specular", lightSource.specular);
-		// sphereMapShader.setUniform("material.ambient", material.ambient);
-		// sphereMapShader.setUniform("material.diffuse", material.diffuse);
-		// sphereMapShader.setUniform("material.specular", material.specular);
-		// sphereMapShader.setUniform("material.shininess", material.shininess);
-
 		sphereMapShader.bind();
 		sphereMapShader.setUniform("modelView", cameraMatrix * modelMatrix);
 		sphereMapShader.setUniform("normalMatrix", glm::transpose(glm::inverse(cameraMatrix * modelMatrix)));
 		sphereMapShader.setUniform("modelViewProjection", projectionMatrix * cameraMatrix * modelMatrix);
-		
+
 		sphereMapShader.setUniform("mirrorMatrix", mirrorMatrix);
 		sphereMapShader.setUniform("mirrorNormalMatrix", glm::transpose(glm::inverse(mirrorMatrix)));
-		
+
 		sphereMapShader.setUniform("viewMatrix", cameraMatrix);
 		sphereMapShader.setUniform("viewNormalMatrix", glm::transpose(glm::inverse(cameraMatrix)));
 		sphereMapShader.setUniform("viewProjectionMatrix", projectionMatrix * cameraMatrix);
@@ -706,6 +706,9 @@ void World::menu(int value) {
 	TriMesh::LoadDesc desc;
 	ZeroMemory(&desc, sizeof(desc));
 
+	glm::mat4 projection;
+	glm::mat4 modelMatrix;
+
 	switch(value) {
 		case 24:
 		reset();
@@ -713,6 +716,7 @@ void World::menu(int value) {
 		case 1:
 		// load rectangle
 		meshPath = quadPath;
+		raytracer.load(Resources::Get<TriMesh>(meshPath));
 		//mesh.loadOff(models[value]);
 		drawRect = true;
 		break;
@@ -731,42 +735,32 @@ void World::menu(int value) {
 		// Check if we already loaded the model before
 		if(Resources::Get<TriMesh>(models[value]) != nullptr) {
 			meshPath = models[value];
-			return;
-		}
-
-		// Construct the loading description
-		desc.path = models[value];
-		desc.format = "off";
-		desc.name = desc.path;
-		desc.textureCorrection = textureCorrection;
-		if(models[value] == "data/bunny2.off" || models[value] == "data/cow.off" || models[value] == "data/cone.off") {
-			desc.winding = TriMesh::CCW;
+			raytracer.load(Resources::Get<TriMesh>(meshPath));
 		} else {
-			desc.winding = TriMesh::CW;
-		}
-		desc.normalize = true;
-		desc.calculateVertexNormals = true;
-		desc.calculateSphereUVs = true;
+			// Construct the loading description
+			desc.path = models[value];
+			desc.format = "off";
+			desc.name = desc.path;
+			desc.textureCorrection = textureCorrection;
+			if(models[value] == "data/bunny2.off" || models[value] == "data/cow.off" || models[value] == "data/cone.off") {
+				desc.winding = TriMesh::CW;
+			} else {
+				desc.winding = TriMesh::CCW;
+			}
+			desc.normalize = true;
+			desc.calculateVertexNormals = true;
+			desc.calculateSphereUVs = true;
 
-		// Load the model
-		try {
-			meshPath = desc.name;
-			Resources::Load<TriMesh>(desc);
-		} catch(exception e) {
-			meshPath = "";
-			cout << e.what() << endl;
+			// Load the model
+			try {
+				meshPath = desc.name;
+				Resources::Load<TriMesh>(desc);
+				raytracer.load(Resources::Get<TriMesh>(meshPath));
+			} catch(exception e) {
+				meshPath = "";
+				cout << e.what() << endl;
+			}
 		}
-		
-		/*
-		mesh.correctTexture(textureCorrection);
-		if(models[value] == "data/bunny2.off" || models[value] == "data/cow.off" || models[value] == "data/cone.off") {
-			mesh.setWinding(TriMesh::CCW);
-		} else mesh.setWinding(TriMesh::CW);
-		mesh.loadOff(models[value]);
-		mesh.center();
-		mesh.unitize();
-		mesh.computeNormals();
-		mesh.computeSphereUVs();*/
 		drawRect = false;
 		drawMesh = true;
 		break;
@@ -813,6 +807,16 @@ void World::menu(int value) {
 		case 22:
 		reset();
 		moveEnvironment = !moveEnvironment;
+		break;
+		case 23:
+		Context::displayWorldWindow();
+		glGetFloatv(GL_PROJECTION_MATRIX, &projection[0][0]);
+		//glGetFloatv(GL_MODELVIEW, &modelView[0][0]);
+		modelMatrix = translate(mat4(1), vec3(shift.x, shift.y, shift.z));
+		modelMatrix *= rotation;
+		modelMatrix = scale(modelMatrix, vec3(scaling));
+		traceTexture = raytracer.raytrace(screen.x, screen.y, glm::vec4(0, 0, screen.x, screen.y), cameraMatrix * modelMatrix, projection, 1.f);
+		Context::displayTextureWindow();
 		break;
 		default:
 		break;

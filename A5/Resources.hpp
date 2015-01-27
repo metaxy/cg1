@@ -10,37 +10,9 @@
 #include "Material.hpp"
 #include "TriMesh.hpp"
 
-/* The loader to load meshes with */
-class MeshLoader {
-public:
-	static TriMesh* load(const TriMesh::LoadDesc& desc);
-
-private:
-	static TriMesh* loadOff(const TriMesh::LoadDesc& desc);
-	static TriMesh* loadObj(const TriMesh::LoadDesc& desc);
-
-	static void center(TriMesh* mesh);
-	static void unitize(TriMesh* mesh);
-	static void computeNormals(TriMesh* mesh);
-
-	static void computeSphereUVs(TriMesh* mesh, bool correct);
-	// calculate bounding sphere
-	static void calculateBoundingSphere(TriMesh* mesh);
-	// calculate bounding box
-	static void calculateBoundingBox(TriMesh* mesh);
-};
-
-/* The loader to load material with */
-class MaterialLoader {
-public:
-	static std::map<std::string, Material*> load(const Material::LoadDesc& desc);
-
-private:
-	static std::map<std::string, Material*> loadMtl(const Material::LoadDesc& desc);
-};
-
 class Resources {
 public:
+	/**** LOADING A RESOURCE ****/
 	template<class T>
 	static void Load(typename const T::LoadDesc& desc) {
 		throw std::exception("Not implemented");
@@ -52,7 +24,7 @@ public:
 		std::map<std::string, Material*> materials;
 
 		// Load the materials
-		materials = MaterialLoader::load(desc);
+		materials = Material::Loader::load(desc);
 
 		// Insert the materials to our material table and remove duplicates
 		for each(std::pair<std::string, Material*> p in materials) {
@@ -64,7 +36,7 @@ public:
 	static void Load<TriMesh>(typename const TriMesh::LoadDesc& desc) {
 		TriMesh* mesh(nullptr);
 
-		mesh = MeshLoader::load(desc);
+		mesh = TriMesh::Loader::load(desc);
 
 		if(mesh != nullptr) {
 			RemoveDuplicate<TriMesh>(desc.name);
@@ -72,11 +44,13 @@ public:
 		}
 	}
 
+	/**** UNLOADING A RESOURCE ****/
 	template<class T>
 	static void Unload(std::string name) {
 		RemoveDuplicate(name);
 	}
 
+	/**** RECEIVING A RESOURCE ****/
 	template<class T>
 	static T* Get(std::string name) {
 		throw std::exception("Not implemented");
@@ -100,6 +74,7 @@ public:
 		}
 	}
 
+	/**** RECEIVING RESOURCE DUPLICATES ****/
 	template<class T>
 	static void RemoveDuplicate(std::string) {
 		throw std::exception("Not implemented");

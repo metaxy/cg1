@@ -16,6 +16,7 @@
     <ClCompile Include="GLSLShader.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="KDTree.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="Raytracer.cpp" />
     <ClCompile Include="Resources.cpp" />
     <ClCompile Include="Texture.cpp" />

@@ -6,26 +6,30 @@
 #include "Image.hpp"
 #include "Intersector.hpp"
 
-void Raytracer::load(TriMesh mesh) {
+void Raytracer::load(TriMesh* mesh) {
 	clearTriangles();
 
-	for each(glm::vec3 f in mesh.faces) {
-		glm::vec2 aUV;
-		glm::vec2 bUV;
-		glm::vec2 cUV;
-		if(!mesh.texCoords.empty()) {
-			aUV = mesh.texCoords[f.x];
-			bUV = mesh.texCoords[f.y];
-			cUV = mesh.texCoords[f.z];
+	for each(glm::vec3 f in mesh->faces) {
+		Triangle* t = new Triangle(
+			mesh->positions[f.x],
+			mesh->positions[f.y],
+			mesh->positions[f.z]
+			);
+
+		// Add the uv coordinates if existing
+		if(!mesh->texCoords.empty()) {
+			t->uv(0) = mesh->texCoords[f.x];
+			t->uv(1) = mesh->texCoords[f.y];
+			t->uv(2) = mesh->texCoords[f.z];
 		}
-		m_triangles.push_back(new Triangle(
-			mesh.positions[f.x],
-			mesh.positions[f.y],
-			mesh.positions[f.z],
-			aUV,
-			bUV,
-			cUV
-			));
+
+		// Calculate the face normal by interpolating the vertex normals
+		if(!mesh->normals.empty()) {
+			// Midpoint has barycentric coordinates a = b = c = 1/3
+			t->normal() = 1.f / 3.f * (mesh->normals[f.x] + mesh->normals[f.y] + mesh->normals[f.z]);
+		}
+
+		m_triangles.push_back(t);
 	}
 
 	m_tree.reset(new KDTree(m_triangles));
@@ -37,48 +41,76 @@ Raytracer::~Raytracer() {
 	clearRays();
 }
 
-void Raytracer::raytrace() {
+Image* Raytracer::raytrace(float winX, float winY, const glm::vec4& viewport,
+						   const glm::mat4& modelView, const glm::mat4& projection,
+						   const float rate) {
 	// Clear rays
 	clearRays();
 
 	// Create the rays
-	createPrimaryRays();
+	createPrimaryRays(winX, winY, viewport, modelView, projection, rate);
 
 	// Clear the data array
 	m_data.clear();
+	m_data.resize(winX * winY);
+	//m_data = std::vector<glm::vec4>();
 
-	// Trace the rays
-	for each(Ray* r in  m_rays)
-		for each(Triangle* t in m_triangles) {
-			glm::vec3 bpoint;
-			if(Intersector::intersect(*r, *t, &bpoint)) {
-				m_data.push_back(glm::vec4(1.f, 0.f, 0.f, 1.f));
+	for(int y = 0; y < winY; ++y) {
+		for(int x = 0; x < winX; ++x) {
+			Ray* r = m_rays[y*winX + x];
+
+			Triangle* hitTriangle = nullptr;
+			glm::vec3 hitPoint = glm::vec3(std::numeric_limits<float>::max(), 
+										   std::numeric_limits<float>::max(),
+										   std::numeric_limits<float>::max());
+			
+
+			for each(Triangle* t in m_triangles) {
+				glm::vec3 newHitPoint;
+
+				if(!Intersector::intersect(*r, *t, &newHitPoint))
+					continue;
+
+				if(newHitPoint.x >= 0 && newHitPoint.x < hitPoint.x) {
+					hitTriangle = t;
+					hitPoint = newHitPoint;
+				}
+			}
+
+			if(hitTriangle) {
+				m_data[y * winX + x] = glm::vec4(0.f, 1.f, 0.f, 1.f);
 			}
 		}
+	}
+
 	if(!m_data.empty()) {
-		buildImage();
+		buildImage(winX, winY);
 	} else {
 		throw std::exception("Fucked.");
 	}
+
+	return &m_image;
 }
 
 
-void Raytracer::createPrimaryRays() {
-	float stepWidth = 1. / m_samplingRate;
-	for(float x = 0.f; x < m_winX; x += stepWidth)
-		for(float y = 0.f; y < m_winY; y += stepWidth) {
+void Raytracer::createPrimaryRays(float winX, float winY, const glm::vec4& viewport,
+								  const glm::mat4& modelView, const glm::mat4& projection,
+								  const float rate) {
+	float stepWidth = 1. / rate;
+	for(float y = 0.f; y < winY; y += stepWidth)
+		for(float x = 0.f; x < winX; x += stepWidth) {
 			glm::vec3 direction;
 			glm::vec3 origin;
 			glm::vec3 camera;
-			camera = glm::vec3(glm::inverse(m_modelView) * glm::vec4());
-			origin = glm::unProject(glm::vec3(x, y, 0), m_modelView, m_projection, glm::vec4(0, 0, m_winX, m_winY));
+			camera = glm::vec3(glm::inverse(modelView) * glm::vec4(0.f, 0.f, 0.f, 1.f));
+			origin = glm::unProject(glm::vec3(x, y, 0), modelView, projection, glm::vec4(0, 0, winX, winY));
 			direction = origin - camera;
 			m_rays.push_back(new Ray(origin, direction));
 		}
 }
-void Raytracer::buildImage() {
+void Raytracer::buildImage(float winX, float winY) {
 	// TODO: Use the sample rate
-	m_image.load(m_data, m_winX, m_winY);
+	m_image.load(m_data, winX, winY);
 	m_image.generateTexture();
 }
 

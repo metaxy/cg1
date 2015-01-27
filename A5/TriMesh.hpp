@@ -36,7 +36,6 @@
  */
 class TriMesh{
 	friend class Raytracer;
-	friend class MeshLoader;
 
 public:
 	// clockwise / counter-clockwise?
@@ -44,7 +43,6 @@ public:
 		CW,
 		CCW
 	};
-
 public:
 	struct LoadDesc {
 		std::string path;
@@ -56,42 +54,25 @@ public:
 		bool calculateSphereUVs;
 		bool calculateVertexNormals;
 	};
-
+	class Loader {
+	public:
+		static TriMesh* load(const TriMesh::LoadDesc& desc);
+	private:
+		static TriMesh* loadOff(const TriMesh::LoadDesc& desc);
+		static TriMesh* loadObj(const TriMesh::LoadDesc& desc);
+		static void center(TriMesh* mesh);
+		static void unitize(TriMesh* mesh);
+		static void computeNormals(TriMesh* mesh);
+		static void computeSphereUVs(TriMesh* mesh, bool correct);
+		static void calculateBoundingSphere(TriMesh* mesh);
+		static void calculateBoundingBox(TriMesh* mesh);
+	};
 public:
-
   // default constructor
   TriMesh();
-  
-  // constructor, calls loadOff()
-  TriMesh(const std::string& fileName, bool normalize = true);
 
   // destructor
   ~TriMesh();
-  
-  // set polygon winding
-  void setWinding(PolygonWinding winding);
-  
-  // load the mesh from an off file
-  void reload();
-  void loadOff(const std::string& filename);
-
-  // normalize to bounding sphere radius 1
-  void unitize(void);
-  // center model
-  void center(void);
-  // calculate bounding sphere
-  void calculateBoundingSphere(void);
-  // calculate bounding box
-  void calculateBoundingBox(void);
-  
-  // compute the normals of the vertices
-  void computeNormals(void);
-
-  // Compute uv coordinates with a spherical mapping
-  // (vertices are projected on a sphere along the normal and classical sphere uv unwrap is used)
-  void computeSphereUVs(void);
-
-  void correctTexture(bool correct);
 
   // draw the model
   void draw(void);
@@ -104,10 +85,6 @@ public:
   static const GLuint attribTexCoord;
   
 protected:
-
-  // file name of current mesh
-  std::string name;
-
   // Position of the vertices
   std::vector<glm::vec3> positions;
   // normals of the vertices
@@ -121,14 +98,10 @@ protected:
 
   std::vector<std::vector<int>> vertexFaceIndices;
 
-  PolygonWinding winding;
-
   // radius of boundingSphere
   float boundingSphereRadius;
 
   // two opposite corners of bounding box 
   glm::vec3 boundingBoxMin;
   glm::vec3 boundingBoxMax;
-
-  bool textureCorrection;
 };

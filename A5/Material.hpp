@@ -2,13 +2,19 @@
 
 #include "glm\glm\glm.hpp"
 
+#include <map>
 #include <string>
 
 class Material {
-	friend class MaterialLoader;
 public:
 	struct LoadDesc {
 		std::string path;
+	};
+	class Loader {
+	public:
+		static std::map<std::string, Material*> load(const Material::LoadDesc& desc);
+	private:
+		static std::map<std::string, Material*> loadMtl(const Material::LoadDesc& desc);
 	};
 
 public:

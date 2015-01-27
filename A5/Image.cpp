@@ -38,11 +38,12 @@ Image::Image(const std::string& filename) : wrapS(GL_REPEAT), wrapT(GL_REPEAT), 
 }
 
 Image::~Image() {
+	glDeleteTextures(1, &textureID);
 }
 
 // generate OpenGL texture
 void Image::generateTexture() {
-
+	
 	if(textureID == 0) {
 		// generate texture id
 		// XXX
@@ -221,7 +222,7 @@ void Image::load(const std::string& filename) {
 		return;
 	}
 }
-void Image::load(const std::vector<glm::vec4>& data, int width, int heigth) {
+void Image::load(const std::vector<glm::vec4>& data, int width, int height) {
 	this->data.clear();
 
 	this->data = data;

@@ -12,6 +12,7 @@
     <ClCompile Include="KDTree.cpp" />
     <ClCompile Include="Raytracer.cpp" />
     <ClCompile Include="Resources.cpp" />
+    <ClCompile Include="Material.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.hpp" />

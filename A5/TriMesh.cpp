@@ -19,7 +19,6 @@
 // use this with care
 // might cause name collisions
 using namespace glm;
-
 using namespace std;
 
 // NVIDIA wants it like this
@@ -29,112 +28,77 @@ const GLuint TriMesh::attribNormal = 2;
 const GLuint TriMesh::attribColor = 3;
 const GLuint TriMesh::attribTexCoord = 8;
 
-enum VertexType {
-	UNKNOWN, LEFT, RIGHT
-};
-
 TriMesh::TriMesh() {
-	winding = CW;
 }
-
-TriMesh::TriMesh(const std::string& fileName, bool normalize) {
-	name = fileName;
-	winding = CW;
-	loadOff(fileName);
-	if(normalize) {
-		center();
-		unitize();
-	}
-	computeNormals();
-}
-
 TriMesh::~TriMesh() {
 }
 
-void TriMesh::setWinding(PolygonWinding winding) {
-	this->winding = winding;
-}
-
-// center model at its origin
-void TriMesh::center(void) {
-
-	calculateBoundingBox();
-
-	vec3 center = (boundingBoxMin + boundingBoxMax) * vec3(0.5);
-
-	for(unsigned int i = 0; i < positions.size(); i++) {
-		positions[i] -= center;
+// draw the mesh using vertex arrays
+void TriMesh::draw(void) {
+	if(!positions.empty()) {
+		glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, &positions[0]);
+		glEnableVertexAttribArray(attribVertex);
+	} else {
+		glDisableVertexAttribArray(attribVertex);
 	}
-	boundingBoxMin -= center;
-	boundingBoxMax -= center;
-}
 
-// normalize to bounding sphere radius 1
-void TriMesh::unitize(void) {
-
-	calculateBoundingSphere();
-
-	for(unsigned int i = 0; i < positions.size(); ++i) {
-		positions[i] /= boundingSphereRadius;
+	if(!normals.empty()) {
+		glVertexAttribPointer(attribNormal, 3, GL_FLOAT, GL_FALSE, 0, &normals[0]);
+		glEnableVertexAttribArray(attribNormal);
+	} else {
+		glDisableVertexAttribArray(attribNormal);
 	}
-	boundingSphereRadius = 1;
-	boundingBoxMin = vec3(-1);
-	boundingBoxMax = vec3(1);
-}
 
-// calculate bounding sphere
-void TriMesh::calculateBoundingSphere(void) {
-
-	boundingSphereRadius = 0;
-	for(unsigned int i = 0; i<positions.size(); i++) {
-		vec3 v = positions[i];
-		if(length(v) > boundingSphereRadius) boundingSphereRadius = length(v);
+	if(!texCoords.empty()) {
+		glVertexAttribPointer(attribTexCoord, 2, GL_FLOAT, GL_FALSE, 0, &texCoords[0]);
+		glEnableVertexAttribArray(attribTexCoord);
+	} else {
+		glDisableVertexAttribArray(attribTexCoord);
 	}
+
+	if(!faces.empty())
+		glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, &faces[0]);
 }
 
-// calculate bounding box
-void TriMesh::calculateBoundingBox(void) {
+/*** The loader class for the tri mesh object ***/
 
-	boundingBoxMin = vec3(numeric_limits<float>::max());
-	boundingBoxMax = vec3(numeric_limits<float>::min());
-	for(unsigned int i = 0; i < positions.size(); i++) {
-		if(positions[i].x < boundingBoxMin.x) boundingBoxMin.x = positions[i].x;
-		if(positions[i].x > boundingBoxMax.x) boundingBoxMax.x = positions[i].x;
-		if(positions[i].y < boundingBoxMin.y) boundingBoxMin.y = positions[i].y;
-		if(positions[i].y > boundingBoxMax.y) boundingBoxMax.y = positions[i].y;
-		if(positions[i].z < boundingBoxMin.z) boundingBoxMin.z = positions[i].z;
-		if(positions[i].z > boundingBoxMax.z) boundingBoxMax.z = positions[i].z;
+TriMesh* TriMesh::Loader::load(const TriMesh::LoadDesc& desc) {
+	TriMesh* mesh(nullptr);
+
+	// Use the loader for the right format
+	if(desc.format == "off") {
+		mesh = TriMesh::Loader::loadOff(desc);
+	} else if(desc.format == "obj") {
+		mesh = TriMesh::Loader::loadObj(desc);
+	} else {
+		throw std::exception((std::string("[MeshLoader] Can't load mesh with format: ") + desc.format).c_str());
 	}
-}
 
-void TriMesh::correctTexture(bool correct) {
-	textureCorrection = correct;
-}
-
-// load triangle mesh in OFF format
-void TriMesh::reload() {
-	loadOff(name);
-}
-
-// load triangle mesh in .OFF format
-void TriMesh::loadOff(const string& fileName) {
-	name = fileName;
-
-	// Clear all lists and buffers
-	positions.clear();
-	normals.clear();
-	faceNormals.clear();
-	faces.clear();
-	texCoords.clear();
-	vertexFaceIndices.clear();
-
-	// Open the model file
-	ifstream inStream;
-	inStream.open(fileName.c_str());
-
-	if(!inStream.is_open()) {
-		exit(1);
+	if(desc.normalize) {
+		TriMesh::Loader::center(mesh);
+		TriMesh::Loader::unitize(mesh);
 	}
+
+	if(desc.calculateVertexNormals)
+		TriMesh::Loader::computeNormals(mesh);
+	if(desc.calculateSphereUVs)
+		TriMesh::Loader::computeSphereUVs(mesh, desc.textureCorrection);
+
+	return mesh;
+}
+TriMesh* TriMesh::Loader::loadOff(const TriMesh::LoadDesc& desc) {
+	// Load an *.off mesh
+
+	// Open the material file
+	std::fstream stream(desc.path, std::ios_base::in);
+
+	if(!stream.is_open()) {
+		// File could not be opened
+		throw std::exception((string("[MeshLoader] Failed to open the file: ") + desc.path.c_str()).c_str());
+	}
+
+	// Create a new empty mesh
+	TriMesh* mesh = new TriMesh();
 
 	string line;
 	int lineNumber = 0;
@@ -145,7 +109,7 @@ void TriMesh::loadOff(const string& fileName) {
 	int numFaces = 0;
 
 	// Read the file line by line
-	while(getline(inStream, line)) {
+	while(getline(stream, line)) {
 		if(line.empty())
 			continue;
 
@@ -159,73 +123,99 @@ void TriMesh::loadOff(const string& fileName) {
 			stringstream sStream(line);
 			sStream >> numVertices >> numFaces;
 		} else {
-			if(numVertices > positions.size()) {
+			if(numVertices > mesh->positions.size()) {
 				// Read a vertex and add it to the list
 				GLfloat x, y, z;
 				stringstream sStream(line);
 				sStream >> x >> y >> z;
 				// Add a position for this vertex 
-				positions.push_back(glm::vec3(x, y, z));
+				mesh->positions.push_back(glm::vec3(x, y, z));
 				// And a vector with face indices
-				vertexFaceIndices.push_back(std::vector<int>());
+				mesh->vertexFaceIndices.push_back(std::vector<int>());
 			} else {
 				// Read a face, make sure the winding is correct and add it to the list
 				GLuint i, a, b, c;
 				stringstream sStream(line);
 				sStream >> i >> a >> b >> c;
 
-				if(winding == PolygonWinding::CCW) {
+				if(desc.winding == TriMesh::PolygonWinding::CW) {
 					// Swap a and c face index
 					i = a;
 					a = c;
 					c = i;
 				}
 
-				faces.push_back(glm::uvec3(a, b, c));
+				mesh->faces.push_back(glm::uvec3(a, b, c));
 
 				// Compute the normal of the face
-				faceNormals.push_back(
+				mesh->faceNormals.push_back(
 					glm::normalize(glm::cross(
-					(positions[b] - positions[a]),
-					(positions[c] - positions[a])
+					(mesh->positions[b] - mesh->positions[a]),
+					(mesh->positions[c] - mesh->positions[a])
 					))
 					);
 
 				// For all three positions add this face index to their face index list
-				vertexFaceIndices[a].push_back(faces.size() - 1);
-				vertexFaceIndices[b].push_back(faces.size() - 1);
-				vertexFaceIndices[c].push_back(faces.size() - 1);
+				mesh->vertexFaceIndices[a].push_back(mesh->faces.size() - 1);
+				mesh->vertexFaceIndices[b].push_back(mesh->faces.size() - 1);
+				mesh->vertexFaceIndices[c].push_back(mesh->faces.size() - 1);
 			}
 		}
 
 		lineNumber++;
 	}
-}
 
-// calculate smooth per-vertex normals
-void TriMesh::computeNormals(void) {
-	for(int i = 0; i < vertexFaceIndices.size(); ++i) {
+	return mesh;
+}
+TriMesh* TriMesh::Loader::loadObj(const TriMesh::LoadDesc& desc) {
+	// Load an *.obj mesh
+	return nullptr;
+}
+void TriMesh::Loader::center(TriMesh* mesh) {
+	TriMesh::Loader::calculateBoundingBox(mesh);
+
+	vec3 center = (mesh->boundingBoxMin + mesh->boundingBoxMax) * vec3(0.5);
+
+	for(unsigned int i = 0; i < mesh->positions.size(); i++) {
+		mesh->positions[i] -= center;
+	}
+	mesh->boundingBoxMin -= center;
+	mesh->boundingBoxMax -= center;
+}
+void TriMesh::Loader::unitize(TriMesh* mesh) {
+	TriMesh::Loader::calculateBoundingSphere(mesh);
+
+	for(unsigned int i = 0; i < mesh->positions.size(); ++i) {
+		mesh->positions[i] /= mesh->boundingSphereRadius;
+	}
+	mesh->boundingSphereRadius = 1;
+	mesh->boundingBoxMin = vec3(-1);
+	mesh->boundingBoxMax = vec3(1);
+}
+void TriMesh::Loader::computeNormals(TriMesh* mesh) {
+	for(int i = 0; i < mesh->vertexFaceIndices.size(); ++i) {
 		vec3 normal = vec3(0, 0, 0);
-		for(int j = 0; j < vertexFaceIndices[i].size(); ++j) {
-			normal += faceNormals[vertexFaceIndices[i][j]];
+		for(int j = 0; j < mesh->vertexFaceIndices[i].size(); ++j) {
+			normal += mesh->faceNormals[mesh->vertexFaceIndices[i][j]];
 		}
-		normal /= vertexFaceIndices[i].size();
-		normals.push_back(glm::normalize(normal));
+		normal /= mesh->vertexFaceIndices[i].size();
+		mesh->normals.push_back(glm::normalize(normal));
 	}
 }
+void TriMesh::Loader::computeSphereUVs(TriMesh* mesh, bool textureCorrection) {
+	enum VertexType {
+		UNKNOWN, LEFT, RIGHT
+	};
 
-// Compute uv coordinates with a spherical mapping
-// (vertices are projected on a sphere along the normal and classical sphere uv unwrap is used)
-void TriMesh::computeSphereUVs(void) {
 	// Calculate the texcoords for each vertex
 	int id = 0;
-	for each(vec3 v in positions) {
-		vec3 d = normals[id];
+	for each(vec3 v in mesh->positions) {
+		vec3 d = mesh->normals[id];
 
 		// (0, 0, 1) -> (0.5, 0.5)
 		float v = 1.f - acos(d.y) / glm::pi<float>();
 		float u = 0.5f + atan2(d.x, d.z) / (2 * glm::pi<float>());
-		texCoords.push_back(vec2(u, v));
+		mesh->texCoords.push_back(vec2(u, v));
 
 		++id;
 	}
@@ -234,11 +224,11 @@ void TriMesh::computeSphereUVs(void) {
 		return;
 
 	// Get the seam faces
-	for(int f = 0; f < faces.size(); ++f) {
+	for(int f = 0; f < mesh->faces.size(); ++f) {
 		// Get the normals of all vertices
-		vec3 n1 = normals[faces[f].x];
-		vec3 n2 = normals[faces[f].y];
-		vec3 n3 = normals[faces[f].z];
+		vec3 n1 = mesh->normals[mesh->faces[f].x];
+		vec3 n2 = mesh->normals[mesh->faces[f].y];
+		vec3 n3 = mesh->normals[mesh->faces[f].z];
 
 		// Project normals to x-z plane
 		n1.y = 0;
@@ -264,81 +254,80 @@ void TriMesh::computeSphereUVs(void) {
 			continue;
 		}
 
-		int a = faces[f].x;
-		int b = faces[f].y;
-		int c = faces[f].z;
+		int a = mesh->faces[f].x;
+		int b = mesh->faces[f].y;
+		int c = mesh->faces[f].z;
 
 		if(t1 == VertexType::RIGHT) {
-			int vid = positions.size();
+			int vid = mesh->positions.size();
 
 			// Copy the vertex with index a
-			positions.push_back(positions[a]);
-			normals.push_back(normals[a]);
+			mesh->positions.push_back(mesh->positions[a]);
+			mesh->normals.push_back(mesh->normals[a]);
 
 			// Assign the right texture coordinates
 			vec2 uv;
-			uv.x = 1.f + texCoords[a].x;
-			uv.y = texCoords[a].y;
-			texCoords.push_back(uv);
+			uv.x = 1.f + mesh->texCoords[a].x;
+			uv.y = mesh->texCoords[a].y;
+			mesh->texCoords.push_back(uv);
 
 			// Set the new face index
 			a = vid;
 		}
 		if(t2 == VertexType::RIGHT) {
-			int vid = positions.size();
+			int vid = mesh->positions.size();
 
 			// Copy the vertex with index a
-			positions.push_back(positions[b]);
-			normals.push_back(normals[b]);
+			mesh->positions.push_back(mesh->positions[b]);
+			mesh->normals.push_back(mesh->normals[b]);
 
 			// Assign the right texture coordinates
 			vec2 uv;
-			uv.x = 1.f + texCoords[b].x;
-			uv.y = texCoords[b].y;
-			texCoords.push_back(uv);
+			uv.x = 1.f + mesh->texCoords[b].x;
+			uv.y = mesh->texCoords[b].y;
+			mesh->texCoords.push_back(uv);
 
 			// Set the new face index
 			b = vid;
 		}
 		if(t3 == VertexType::RIGHT) {
-			int vid = positions.size();
+			int vid = mesh->positions.size();
 
 			// Copy the vertex with index a
-			positions.push_back(positions[c]);
-			normals.push_back(normals[c]);
+			mesh->positions.push_back(mesh->positions[c]);
+			mesh->normals.push_back(mesh->normals[c]);
 
 			// Assign the right texture coordinates
 			vec2 uv;
-			uv.x = 1.f + texCoords[c].x;
-			uv.y = texCoords[c].y;
-			texCoords.push_back(uv);
+			uv.x = 1.f + mesh->texCoords[c].x;
+			uv.y = mesh->texCoords[c].y;
+			mesh->texCoords.push_back(uv);
 
 			// Set the new face index
 			c = vid;
 		}
 
 		// Alter the face
-		faces[f] = uvec3(a, b, c);
+		mesh->faces[f] = uvec3(a, b, c);
 	}
 }
+void TriMesh::Loader::calculateBoundingSphere(TriMesh* mesh) {
 
-// draw the mesh using vertex arrays
-void TriMesh::draw(void) {
-	if(!positions.empty()) {
-		glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, &positions[0]);
-		glEnableVertexAttribArray(attribVertex);
+	mesh->boundingSphereRadius = 0;
+	for(unsigned int i = 0; i<mesh->positions.size(); i++) {
+		vec3 v = mesh->positions[i];
+		if(length(v) > mesh->boundingSphereRadius) mesh->boundingSphereRadius = length(v);
 	}
-
-	if(!normals.empty()) {
-		glVertexAttribPointer(attribNormal, 3, GL_FLOAT, GL_FALSE, 0, &normals[0]);
-		glEnableVertexAttribArray(attribNormal);
+}
+void TriMesh::Loader::calculateBoundingBox(TriMesh* mesh) {
+	mesh->boundingBoxMin = vec3(numeric_limits<float>::max());
+	mesh->boundingBoxMax = vec3(numeric_limits<float>::min());
+	for(unsigned int i = 0; i < mesh->positions.size(); i++) {
+		if(mesh->positions[i].x < mesh->boundingBoxMin.x) mesh->boundingBoxMin.x = mesh->positions[i].x;
+		if(mesh->positions[i].x > mesh->boundingBoxMax.x) mesh->boundingBoxMax.x = mesh->positions[i].x;
+		if(mesh->positions[i].y < mesh->boundingBoxMin.y) mesh->boundingBoxMin.y = mesh->positions[i].y;
+		if(mesh->positions[i].y > mesh->boundingBoxMax.y) mesh->boundingBoxMax.y = mesh->positions[i].y;
+		if(mesh->positions[i].z < mesh->boundingBoxMin.z) mesh->boundingBoxMin.z = mesh->positions[i].z;
+		if(mesh->positions[i].z > mesh->boundingBoxMax.z) mesh->boundingBoxMax.z = mesh->positions[i].z;
 	}
-
-	if(!texCoords.empty()) {
-		glVertexAttribPointer(attribTexCoord, 2, GL_FLOAT, GL_FALSE, 0, &texCoords[0]);
-		glEnableVertexAttribArray(attribTexCoord);
-	}
-
-	if(!faces.empty())
-		glDrawElements(GL_TRIANGLES, faces.size() * 3, GL_UNSIGNED_INT, &faces[0]);
 }
