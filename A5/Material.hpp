@@ -5,7 +5,11 @@
 #include <string>
 
 class Material {
-	friend class Resources;
+	friend class MaterialLoader;
+public:
+	struct LoadDesc {
+		std::string path;
+	};
 
 public:
 	inline Material(glm::vec4 ambient = glm::vec4(),
@@ -37,6 +41,4 @@ private:
 	glm::vec4 m_specular;
 	// shininess
 	float m_shininess;
-	// Name
-	std::string m_name;
 };

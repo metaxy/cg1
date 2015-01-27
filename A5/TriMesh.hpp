@@ -29,11 +29,34 @@
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtx/unsigned_int.hpp"
 
+#include <string>
+
 /*
  * Class for a simple triangle mesh represented as an indexed face set
  */
 class TriMesh{
 	friend class Raytracer;
+	friend class MeshLoader;
+
+public:
+	// clockwise / counter-clockwise?
+	enum PolygonWinding {
+		CW,
+		CCW
+	};
+
+public:
+	struct LoadDesc {
+		std::string path;
+		std::string format;
+		std::string name;
+		PolygonWinding winding;
+		bool textureCorrection;
+		bool normalize;
+		bool calculateSphereUVs;
+		bool calculateVertexNormals;
+	};
+
 public:
 
   // default constructor
@@ -44,12 +67,6 @@ public:
 
   // destructor
   ~TriMesh();
-
-  // clockwise / counter-clockwise?
-  enum PolygonWinding{
-    CW,
-    CCW
-  };
   
   // set polygon winding
   void setWinding(PolygonWinding winding);
@@ -95,10 +112,14 @@ protected:
   std::vector<glm::vec3> positions;
   // normals of the vertices
   std::vector<glm::vec3> normals;
-  // indices of the faces
   // texture coordinates of the vertices
   std::vector<glm::vec2> texCoords;
+  // Normals of the faces
+  std::vector <glm::vec3> faceNormals;
+  // indices of the faces
   std::vector<glm::uvec3> faces;
+
+  std::vector<std::vector<int>> vertexFaceIndices;
 
   PolygonWinding winding;
 

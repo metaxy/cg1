@@ -151,6 +151,8 @@ void Context::init(int argc, char **argv){
 
  // load shader
   Common::loadShaders();
+  // Load the models
+  Common::loadModels();
     
  glutMainLoop();
 }

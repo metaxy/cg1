@@ -19,6 +19,7 @@
 #include <GL/freeglut.h>
 #endif
 
+#include <exception>
 #include <string>
 #include <iostream>
 #include <math.h>
@@ -36,13 +37,16 @@
 #include "GLSLShader.hpp"
 #include "Light.hpp"
 #include "Material.hpp"
+#include "Resources.hpp"
 
 using namespace glm;
 using namespace std;
 
-static TriMesh mesh;
+//static TriMesh mesh;
+static string meshPath;
 // full screen quad
-static TriMesh quad("data/quad.off", false); // do not center and unitize
+//static TriMesh quad("data/quad.off", false); // do not center and unitize
+static const string quadPath = "data/quad.off";
 
 #define PI  3.14159265358979323846264338327950288f
 #define RADIANS(x) (((x)*PI)/180.0f)
@@ -129,7 +133,25 @@ void Common::loadShaders() {
 	// END XXX
 }
 
-
+void Common::loadModels() {
+	// Load the mandatory models as resource
+	try {
+		// Load the full screen quad
+		TriMesh::LoadDesc desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.path = quadPath;
+		desc.format = "off";
+		desc.name = quadPath;
+		desc.winding = TriMesh::CW;
+		desc.normalize = false;
+		desc.calculateSphereUVs = false;
+		desc.calculateVertexNormals = false;
+		Resources::Load<TriMesh>(desc);
+	} catch(exception& e) {
+		cout << e.what() << endl;
+		exit(1);
+	}
+}
 // calculate cursor position
 // XXX: NEEDS TO BE IMPLEMENTED
 static void updateCursor(int x, int y) {
@@ -245,7 +267,8 @@ void Texture::display(void) {
 	// INSERT YOUR CODE HERE
 	flatQuadShader.bind();
 	texture.bind();
-	quad.draw();
+	Resources::Get<TriMesh>(quadPath)->draw();
+//	quad.draw();
 	flatQuadShader.unbind();
 	texture.unbind();
 	// END XXX
@@ -539,7 +562,9 @@ void World::display(void) {
 		sphereMapShader.setUniform("material.specular", material.getSpecular());
 		sphereMapShader.setUniform("material.shininess", material.getShininess());
 		texture.bind();
-		mesh.draw();
+		TriMesh* m = Resources::Get<TriMesh>(meshPath);
+		if(m) m->draw();
+		//mesh.draw();
 		texture.unbind();
 		sphereMapShader.unbind();
 
@@ -567,7 +592,9 @@ void World::display(void) {
 		quadShader.setUniform("material.specular", material.getSpecular());
 		quadShader.setUniform("material.shininess", material.getShininess());
 		texture.bind();
-		mesh.draw();
+		TriMesh* m = Resources::Get<TriMesh>(meshPath);
+		if(m) m->draw();
+		//mesh.draw();
 		texture.unbind();
 		quadShader.unbind();
 
@@ -598,7 +625,11 @@ void World::display(void) {
 		texturingShader.setUniform("material.specular", material.getSpecular());
 		texturingShader.setUniform("material.shininess", material.getShininess());
 		texture.bind();
+		TriMesh* m = Resources::Get<TriMesh>(meshPath);
+		if(m) m->draw();
+		/*
 		mesh.draw();
+		*/
 		texture.unbind();
 		texturingShader.unbind();
 
@@ -672,6 +703,8 @@ void World::mouseDragged(int x, int y) {
 // menu callback
 // XXX: NEEDS TO BE IMPLEMENTED
 void World::menu(int value) {
+	TriMesh::LoadDesc desc;
+	ZeroMemory(&desc, sizeof(desc));
 
 	switch(value) {
 		case 24:
@@ -679,7 +712,8 @@ void World::menu(int value) {
 		break;
 		case 1:
 		// load rectangle
-		mesh.loadOff(models[value]);
+		meshPath = quadPath;
+		//mesh.loadOff(models[value]);
 		drawRect = true;
 		break;
 		case 2:
@@ -694,6 +728,36 @@ void World::menu(int value) {
 		case 11:
 		case 12:
 		case 13:
+		// Check if we already loaded the model before
+		if(Resources::Get<TriMesh>(models[value]) != nullptr) {
+			meshPath = models[value];
+			return;
+		}
+
+		// Construct the loading description
+		desc.path = models[value];
+		desc.format = "off";
+		desc.name = desc.path;
+		desc.textureCorrection = textureCorrection;
+		if(models[value] == "data/bunny2.off" || models[value] == "data/cow.off" || models[value] == "data/cone.off") {
+			desc.winding = TriMesh::CCW;
+		} else {
+			desc.winding = TriMesh::CW;
+		}
+		desc.normalize = true;
+		desc.calculateVertexNormals = true;
+		desc.calculateSphereUVs = true;
+
+		// Load the model
+		try {
+			meshPath = desc.name;
+			Resources::Load<TriMesh>(desc);
+		} catch(exception e) {
+			meshPath = "";
+			cout << e.what() << endl;
+		}
+		
+		/*
 		mesh.correctTexture(textureCorrection);
 		if(models[value] == "data/bunny2.off" || models[value] == "data/cow.off" || models[value] == "data/cone.off") {
 			mesh.setWinding(TriMesh::CCW);
@@ -702,7 +766,7 @@ void World::menu(int value) {
 		mesh.center();
 		mesh.unitize();
 		mesh.computeNormals();
-		mesh.computeSphereUVs();
+		mesh.computeSphereUVs();*/
 		drawRect = false;
 		drawMesh = true;
 		break;
@@ -724,22 +788,22 @@ void World::menu(int value) {
 
 		case 19:
 		// enable/disable texture correction in Image (not obligatory, but useful for debugging)
-		textureCorrection = !textureCorrection;
-		mesh.correctTexture(textureCorrection);
-		mesh.reload();
-		mesh.center();
-		mesh.unitize();
-		mesh.computeNormals();
-		mesh.computeSphereUVs();
-		break;
-		case 20:
-		// set texture wrapping in Image (not obligatory, but useful for debugging)
-		if(wrap == GL_REPEAT) {
-			wrap = GL_CLAMP_TO_BORDER;
-		} else {
-			wrap = GL_REPEAT;
-		}
-		texture.setWrap(wrap);
+		//textureCorrection = !textureCorrection;
+		//mesh.correctTexture(textureCorrection);
+		//mesh.reload();
+		//mesh.center();
+		//mesh.unitize();
+		//mesh.computeNormals();
+		//mesh.computeSphereUVs();
+		//break;
+		//case 20:
+		//// set texture wrapping in Image (not obligatory, but useful for debugging)
+		//if(wrap == GL_REPEAT) {
+		//	wrap = GL_CLAMP_TO_BORDER;
+		//} else {
+		//	wrap = GL_REPEAT;
+		//}
+		//texture.setWrap(wrap);
 		break;
 		break;
 		case 21:

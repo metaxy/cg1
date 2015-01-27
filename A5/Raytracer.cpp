@@ -4,7 +4,7 @@
 #include "glm\glm\gtc\matrix_transform.hpp"
 #include "Ray.hpp"
 #include "Image.hpp"
-#include "Utils.hpp"
+#include "Intersector.hpp"
 
 void Raytracer::load(TriMesh mesh) {
 	clearTriangles();
@@ -51,7 +51,7 @@ void Raytracer::raytrace() {
 	for each(Ray* r in  m_rays)
 		for each(Triangle* t in m_triangles) {
 			glm::vec3 bpoint;
-			if(intersect(*r, *t, &bpoint)) {
+			if(Intersector::intersect(*r, *t, &bpoint)) {
 				m_data.push_back(glm::vec4(1.f, 0.f, 0.f, 1.f));
 			}
 		}

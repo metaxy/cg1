@@ -20,6 +20,7 @@ class Material;
 namespace Common{
 
   void loadShaders();
+  void loadModels();
   // common keyboard callback
   void keyPressed(unsigned char key, int x, int y);
 };

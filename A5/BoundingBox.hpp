@@ -5,7 +5,7 @@
 
 #include "glm\glm\glm.hpp"
 
-enum Axis {X, Y, Z};
+enum Axis {UNKNOWN, X, Y, Z};
 
 class BoundingBox {
 public:
@@ -39,6 +39,8 @@ public:
 		if(dz >= dx && dz >= dy) {
 			return Z;
 		}
+
+		return UNKNOWN;
 	}
 
 private:

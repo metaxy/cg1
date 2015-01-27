@@ -38,7 +38,6 @@ TriMesh::TriMesh() {
 }
 
 TriMesh::TriMesh(const std::string& fileName, bool normalize) {
-
 	name = fileName;
 	winding = CW;
 	loadOff(fileName);
@@ -124,8 +123,10 @@ void TriMesh::loadOff(const string& fileName) {
 	// Clear all lists and buffers
 	positions.clear();
 	normals.clear();
+	faceNormals.clear();
 	faces.clear();
 	texCoords.clear();
+	vertexFaceIndices.clear();
 
 	// Open the model file
 	ifstream inStream;
@@ -163,8 +164,10 @@ void TriMesh::loadOff(const string& fileName) {
 				GLfloat x, y, z;
 				stringstream sStream(line);
 				sStream >> x >> y >> z;
-
+				// Add a position for this vertex 
 				positions.push_back(glm::vec3(x, y, z));
+				// And a vector with face indices
+				vertexFaceIndices.push_back(std::vector<int>());
 			} else {
 				// Read a face, make sure the winding is correct and add it to the list
 				GLuint i, a, b, c;
@@ -179,6 +182,19 @@ void TriMesh::loadOff(const string& fileName) {
 				}
 
 				faces.push_back(glm::uvec3(a, b, c));
+
+				// Compute the normal of the face
+				faceNormals.push_back(
+					glm::normalize(glm::cross(
+					(positions[b] - positions[a]),
+					(positions[c] - positions[a])
+					))
+					);
+
+				// For all three positions add this face index to their face index list
+				vertexFaceIndices[a].push_back(faces.size() - 1);
+				vertexFaceIndices[b].push_back(faces.size() - 1);
+				vertexFaceIndices[c].push_back(faces.size() - 1);
 			}
 		}
 
@@ -188,33 +204,12 @@ void TriMesh::loadOff(const string& fileName) {
 
 // calculate smooth per-vertex normals
 void TriMesh::computeNormals(void) {
-	vector<vec3> faceNormals;
-
-	// Calculate the normals for all faces
-	for(uvec3 face : faces) {
-		faceNormals.push_back(
-			glm::normalize(glm::cross(
-			(positions[face.y] - positions[face.x]),
-			(positions[face.z] - positions[face.x])
-			))
-		);
-	}
-
-	// Iterate over all vertices
-	for(int i = 0; i < positions.size(); ++i) {
-		int numFaces = 0;
+	for(int i = 0; i < vertexFaceIndices.size(); ++i) {
 		vec3 normal = vec3(0, 0, 0);
-
-		// Determin which face contains this vertex and add the face normal to the vertex normal
-		for(int j = 0; j < faces.size(); ++j) {
-			if(faces[j].x == i || faces[j].y == i || faces[j].z == i) {
-				++numFaces;
-				normal += faceNormals[j];
-			}
+		for(int j = 0; j < vertexFaceIndices[i].size(); ++j) {
+			normal += faceNormals[vertexFaceIndices[i][j]];
 		}
-
-		// Weight the face normals and calculate the final vertex normal
-		normal /= numFaces;
+		normal /= vertexFaceIndices[i].size();
 		normals.push_back(glm::normalize(normal));
 	}
 }
