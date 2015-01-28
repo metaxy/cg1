@@ -69,6 +69,6 @@ public:
 		if(point)
 			*point = glm::vec3(t, u, v);
 
-		return u > 0 && u < 1 && v > 0 && v < 1 && u + v < 1 && t > 0;
+		return (u >= 0) && (u <= 1) && (v >= 0) && (v <= 1) && (u + v <= 1) && (t >= 0);
 	}
 };

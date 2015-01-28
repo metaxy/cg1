@@ -13,9 +13,8 @@
 #include <string>
 
 #include "glm/glm/glm.hpp"
-
-struct Light;
-class Material;
+#include "Light.hpp"
+#include "Material.hpp"
 
 namespace Common{
 

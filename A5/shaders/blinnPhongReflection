@@ -53,5 +53,5 @@ vec4 blinnPhongReflection(vec4 position, vec3 normal){
 	vec4 specularColor = lightSource.specular * material.specular * specularIntensity;
 
 	// Return the final color
-	return ambientColor + diffuseColor + specularColor;
+	return clamp(ambientColor + diffuseColor + specularColor, 0.0, 1.0);
 }

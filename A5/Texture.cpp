@@ -506,7 +506,7 @@ void World::display(void) {
 	}
 
 	if(raytracer.m_tree) {
-		raytracer.m_tree->Render();
+	//	raytracer.m_tree->Render();
 	}
 
 	// draw the geometry
@@ -517,9 +517,8 @@ void World::display(void) {
 	modelMatrix *= rotation;
 	modelMatrix = scale(modelMatrix, vec3(scaling));
 
-	//glClear(GL_COLOR_BUFFER_BIT);
-	//glDepthFunc(GL_EQUAL);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	if(environmentMapping) {
 
@@ -830,11 +829,11 @@ void World::menu(int value) {
 }
 
 void World::setupLight() {
-	lightSource.position = glm::vec4(0.f, 0.f, 0.f, 1.f);
-	lightSource.ambient = glm::vec4(0.1f, 0.1f, 0.1f, 1.f);
-	lightSource.diffuse = glm::vec4(1.f, 1.f, 1.f, 1.f);
+	lightSource.position = glm::vec4(1.7f, 0.f, 0.f, 1.f);
+	lightSource.ambient = glm::vec4(0.0f, 0.1f, 0.0f, 1.f);
+	lightSource.diffuse = glm::vec4(0.f, 1.f, 0.f, 1.f);
 	lightSource.specular = glm::vec4(1.f, 1.f, 1.f, 1.f);
 }
 void World::setupMaterial() {
-	material = Material(vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), 50);
+	material = Material(vec4(1, 1,1, 1), vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), 50);
 }

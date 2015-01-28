@@ -1,8 +1,9 @@
 #pragma once
 
+#include <math.h>
 #include <memory>
 #include <vector>
-
+#include <unordered_map>
 #include "KDTree.hpp"
 #include "TriMesh.hpp"
 #include "Triangle.hpp"
@@ -31,11 +32,14 @@ private:
 
 	void clearTriangles();
 	void clearRays();
+	glm::vec4 blinnPhong(glm::vec4 position, glm::vec3 normal);
 //private:
 public:
 	std::vector<Triangle*> m_triangles;
 	std::unique_ptr<KDTree> m_tree;
 	std::vector<Ray*> m_rays;
+	std::unordered_map<int, std::vector<Ray*>> m_rays2;
+
 
 	// Image information
 	std::vector<glm::vec4> m_data;
