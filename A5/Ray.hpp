@@ -2,7 +2,18 @@
 
 #include "glm\glm\glm.hpp"
 
+class Triangle;
+
 class Ray {
+public:
+	struct RayHit {
+		RayHit(Triangle* tri = nullptr, glm::vec3 coords = glm::vec3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()))
+			: t(tri), bcoords(coords) {
+		}
+
+		Triangle* t;
+		glm::vec3 bcoords;
+	};
 public:
 	inline Ray() {
 	}

@@ -58,13 +58,13 @@ Image* Raytracer::raytrace(float winX, float winY, const glm::vec4& viewport,
 	for(int y = 0; y < winY; ++y) {
 		for(int x = 0; x < winX; ++x) {
 			Ray* r = m_rays[y*winX + x];
-
+			
 			Triangle* hitTriangle = nullptr;
+			/*
 			glm::vec3 hitPoint = glm::vec3(std::numeric_limits<float>::max(), 
 										   std::numeric_limits<float>::max(),
 										   std::numeric_limits<float>::max());
 			
-
 			for each(Triangle* t in m_triangles) {
 				glm::vec3 newHitPoint;
 
@@ -75,8 +75,10 @@ Image* Raytracer::raytrace(float winX, float winY, const glm::vec4& viewport,
 					hitTriangle = t;
 					hitPoint = newHitPoint;
 				}
-			}
+			}*/
 
+			auto hit = m_tree->hit(*r);
+			hitTriangle = hit.t;
 			if(hitTriangle) {
 				m_data[y * winX + x] = glm::vec4(0.f, 1.f, 0.f, 1.f);
 			}

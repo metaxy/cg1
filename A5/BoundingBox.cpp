@@ -4,7 +4,8 @@
 
 using namespace std;
 
-BoundingBox::BoundingBox() {
+BoundingBox::BoundingBox() :
+m_min(glm::vec3(0, 0, 0)), m_max(glm::vec3(0, 0, 0)){
 }
 BoundingBox::BoundingBox(const glm::vec3& min, const glm::vec3& max)
 : m_min(min), m_max(max) {

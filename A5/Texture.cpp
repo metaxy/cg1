@@ -267,6 +267,7 @@ void Texture::display(void) {
 
 	// display textured full screen quad
 	// XXX
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// INSERT YOUR CODE HERE
 	flatQuadShader.bind();
@@ -515,6 +516,10 @@ void World::display(void) {
 	mat4 modelMatrix = translate(mat4(1), vec3(shift.x, shift.y, shift.z));
 	modelMatrix *= rotation;
 	modelMatrix = scale(modelMatrix, vec3(scaling));
+
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//glDepthFunc(GL_EQUAL);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	if(environmentMapping) {
 

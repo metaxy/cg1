@@ -10,7 +10,7 @@
 class Intersector {
 public:
 	template<class S, class T>
-	static bool intersect(const S& obj1, const T& obj2, glm::vec3* point) {
+	static bool intersect(const S& obj1, const T& obj2, glm::vec3* point = nullptr) {
 		// TODO: Implement
 		return false;
 	}
@@ -22,7 +22,8 @@ public:
 		   obj2.x <= obj1.getMax().x &&
 		   obj2.y <= obj1.getMax().y &&
 		   obj2.z <= obj1.getMax().z) {
-			*point = obj2;
+			if(point)
+				*point = obj2;
 			return true;
 		}
 
@@ -65,7 +66,8 @@ public:
 		float u = idet * glm::dot(glm::cross(rd, v2 - v0), ro - v0);
 		float v = idet * glm::dot(glm::cross(ro - v0, v1 - v0), rd);
 
-		*point = glm::vec3(t, u, v);
+		if(point)
+			*point = glm::vec3(t, u, v);
 
 		return u > 0 && u < 1 && v > 0 && v < 1 && u + v < 1 && t > 0;
 	}
