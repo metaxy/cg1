@@ -64,12 +64,15 @@ KDTree::KDNode* KDTree::build(const std::vector<Triangle*>& triangles, const int
 
 	node->bbox = bbox;
 
-	// If right && left == null : node.triangles = triangles
-	// if right == null && left != null : node.triangles = right
-	// ...
-	// if both != null : node.triangles = std::vector();
-
-	node->triangles = triangles;
+	if(node->left && node->right) {
+		node->triangles = std::vector<Triangle*>();
+	} else if(!node->left && node->right) {
+		node->triangles = left;
+	} else if(node->left && !node->right) {
+		node->triangles = right;
+	} else {
+		node->triangles = triangles;
+	}
 
 	return node;
 }
