@@ -14,6 +14,8 @@
 #elif _WIN32
 #include "win32/glew.h"
 #include "win32/freeglut.h"
+#include <Windows.h>
+#include <mmsystem.h>
 #else
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -24,8 +26,9 @@
 #include <iostream>
 #include <math.h>
 
-#include "glm/glm/glm.hpp"
+
 #define GLM_FORCE_RADIANS
+#include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/matrix_inverse.hpp"
 #include "glm\glm\gtc\constants.hpp"
@@ -39,15 +42,16 @@
 #include "Material.hpp"
 #include "Resources.hpp"
 #include "Raytracer.hpp"
+#include "Scene.hpp"
 
 using namespace glm;
 using namespace std;
 
 //static TriMesh mesh;
-static string meshPath;
+// static string meshPath;
 // full screen quad
-//static TriMesh quad("data/quad.off", false); // do not center and unitize
-static const string quadPath = "data/quad.off";
+// static TriMesh quad("data/quad.off", false); // do not center and unitize
+// static const string quadPath = "data/quad.obj";
 
 #define PI  3.14159265358979323846264338327950288f
 #define RADIANS(x) (((x)*PI)/180.0f)
@@ -65,8 +69,6 @@ static bool showCoordinates = true;
 static bool showOrigin = true;
 static bool environmentMapping = false;
 static bool moveEnvironment = false;
-static bool drawMesh = true;
-static bool drawRect = false;
 
 static GLuint modulation = GL_MODULATE;
 static GLuint wrap = GL_REPEAT;
@@ -74,7 +76,7 @@ static GLuint wrap = GL_REPEAT;
 static mat4 cameraMatrix;
 static mat4 rotation = mat4(1); // current rotation of object
 static vec3 shift = vec3(0); // offset
-static float scaling = 1; // scale
+//static float scaling = 1; // scale
 
 static vec2 screen;  // screen size
 static float fov = 60.0; // field of view
@@ -98,6 +100,18 @@ static GLSLShader texturingShader;
 static GLSLShader sphereMapShader;
 
 static Raytracer raytracer;
+static mat4 snapshotRotation = mat4(1);
+static vec3 snapshotShift = vec3(0);
+static float snapshotScaling = 1;
+static bool renderDots = true;
+static bool coloredDots = false;
+
+static Scene scene;
+static bool renderKDTree = false;
+static bool renderScene = true;
+
+static float samplingRate = 1.f;
+static int recursionDepth = 0;
 
 /*************************************************************************************/
 
@@ -112,12 +126,6 @@ void Common::loadShaders() {
 	flatQuadShader.bindVertexAttrib("position", TriMesh::attribVertex);
 	flatQuadShader.link();
 
-	quadShader.loadVertexShader("shaders/quad.vert");
-	quadShader.loadFragmentShader("shaders/quad.frag");
-	quadShader.loadFragmentShader("shaders/blinnPhongReflection");
-	quadShader.bindVertexAttrib("position", TriMesh::attribVertex);
-	quadShader.link();
-
 	texturingShader.loadVertexShader("shaders/texturing.vert");
 	texturingShader.loadFragmentShader("shaders/texturing.frag");
 	texturingShader.loadFragmentShader("shaders/blinnPhongReflection");
@@ -126,13 +134,7 @@ void Common::loadShaders() {
 	texturingShader.bindVertexAttrib("texcoord", TriMesh::attribTexCoord);
 	texturingShader.link();
 
-	sphereMapShader.loadVertexShader("shaders/sphereMap.vert");
-	sphereMapShader.loadFragmentShader("shaders/sphereMap.frag");
-	sphereMapShader.loadFragmentShader("shaders/blinnPhongReflection");
-	sphereMapShader.bindVertexAttrib("position", TriMesh::attribVertex);
-	sphereMapShader.bindVertexAttrib("normal", TriMesh::attribNormal);
-	sphereMapShader.bindVertexAttrib("texcoord", TriMesh::attribTexCoord);
-	sphereMapShader.link();
+	cout << endl;
 
 	// END XXX
 }
@@ -141,72 +143,104 @@ void Common::loadModels() {
 	// Load the mandatory models as resource
 	try {
 		// Load the full screen quad
+		/*if(models[value] == "data/bunny2.off" || models[value] == "data/cow.off" || models[value] == "data/cone.off") {
+				desc.winding = TriMesh::CW;
+				} else {
+				desc.winding = TriMesh::CCW;
+				}*/
+
+		// Load the quad as obj
 		TriMesh::LoadDesc desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.path = quadPath;
-		desc.format = "off";
-		desc.name = quadPath;
+		desc.path = "meshes/quad.obj";
+		desc.format = "obj";
+		desc.name = "quad";
 		desc.winding = TriMesh::CW;
 		desc.normalize = false;
 		desc.calculateSphereUVs = false;
-		desc.calculateVertexNormals = false;
+		desc.calculateVertexNormals = true;
 		Resources::Load<TriMesh>(desc);
+
+		desc.path = "meshes/auto.off";
+		desc.format = "off";
+		desc.name = "auto";
+		desc.winding = TriMesh::CCW;
+		desc.normalize = true;
+		desc.calculateSphereUVs = true;
+		desc.calculateVertexNormals = true;
+		Resources::Load<TriMesh>(desc);
+
+		/*desc.path = "data/bialetti.off";
+		desc.name = "bialetti";
+		Resources::Load<TriMesh>(desc);*/
+
+		desc.path = "meshes/spaceshuttle.off";
+		desc.name = "shuttle";
+		Resources::Load<TriMesh>(desc);
+
+		desc.path = "meshes/sphere.off";
+		desc.name = "sphere";
+		Resources::Load<TriMesh>(desc);
+
 	} catch(exception& e) {
 		cout << e.what() << endl;
 		exit(1);
 	}
-}
-// calculate cursor position
-// XXX: NEEDS TO BE IMPLEMENTED
-static void updateCursor(int x, int y) {
 
-	// XXX
+	cout << endl;
 
-	// INSERT YOUR CODE HERE
-	float u = x / screen.x;
-	float v = 1 - y / screen.y;
-	float ny = cos((1.f - v) * glm::pi<float>());
-	float theta = (u - 0.5f) * (2 * glm::pi<float>());
-	float nx = sin(theta);
-	float nz = cos(theta);
-	double l = glm::sqrt((1.f * 1.f - ny * ny) / (nx * nx + nz * nz));
-
-	cursor = vec3(l*nx, ny, l*nz);
-	/*cout << "(" << nx << ", " << ny << ", " << nz << ")" << endl;*/
-
-	/*float v_old = 1.f - acos(ny) / glm::pi<float>();
-	float u_old = 0.5f + atan2(nz, nx) / (2 * glm::pi<float>());
-	cout << u << " " << v << " vs " << u_old << " " << v_old << endl;*/
-	// END XXX
+	// Build the scene
+	Scene::BuildScene(scene);
+	scene.BuildKDTree();
 }
 
 static void reset() {
-
 	rotation = mat4(1); // current rotation of object
-	cameraZMap = 0;
 	shift = vec3(0); // offset
-	fov = 60.0;
+	fov = 60.f;
+}
+
+static void snapshotReset() {
+	rotation = snapshotRotation;
+	shift = snapshotShift;
+	//scaling = snapshotScaling;
 }
 
 void Common::keyPressed(unsigned char key, int x, int y) {
 
 	switch(key) {
+		case ' ':
+		World::Raytrace();
+		break;
 
-		case 'q':
 		case 'Q':
 		exit(EXIT_SUCCESS);
 		break;
 
-		case 'r':
+		/*case 'r':
 		reset();
-		break;
+		break;*/
 
 		case 's':
-		scaling *= 0.9;
+		samplingRate -= 0.25f;
+		samplingRate = max(samplingRate, 0.f);
+		cout << "Sampling Rate: " << to_string(samplingRate) << endl;
 		break;
 
 		case 'S':
-		scaling *= 1.1;
+		samplingRate += 0.25f;
+		cout << "Sampling Rate: " << to_string(samplingRate) << endl;
+		break;
+
+		case 'r':
+		recursionDepth -= 1;
+		recursionDepth = max(recursionDepth, 0);
+		cout << "Recursion Depth: " << to_string(recursionDepth) << endl;
+		break;
+
+		case 'R':
+		recursionDepth += 1;
+		cout << "Recursion Depth: " << to_string(recursionDepth) << endl;
 		break;
 
 		case 'c':
@@ -276,10 +310,14 @@ void Texture::display(void) {
 	} else {
 		texture.bind();
 	}
-	Resources::Get<TriMesh>(quadPath)->draw();
+	Resources::Get<TriMesh>("quad")->draw();
 	//	quad.draw();
 	flatQuadShader.unbind();
-	texture.unbind();
+	if(traceTexture != nullptr) {
+		traceTexture->unbind();
+	} else {
+		texture.unbind();
+	}
 	// END XXX
 
 	glutSwapBuffers();
@@ -293,15 +331,6 @@ void Texture::mousePressed(int button, int state, int x, int y) {
 // mouse dragged callback
 // XXX: NEEDS TO BE IMPLEMENTED
 void Texture::mouseDragged(int x, int y) {
-	if(drag == DragMode::DRAW) {
-		texture.paint((x / screen.x) * texture.getWidth(), ((screen.y - y) / screen.y) * texture.getHeight());
-	} else {
-		texture.erase((x / screen.x) * texture.getWidth(), ((screen.y - y) / screen.y) * texture.getHeight());
-	}
-
-
-	updateCursor(x, y);
-
 	previousMouse = vec2(x, y);
 
 	Context::displayTextureWindow();
@@ -309,10 +338,6 @@ void Texture::mouseDragged(int x, int y) {
 }
 
 void Texture::mouseMoved(int x, int y) {
-
-	if(x > 0 && x < screen.x && y > 0 && y < screen.y) {
-		updateCursor(x, y);
-	}
 }
 
 // menu callback
@@ -401,10 +426,8 @@ void Texture::menu(int value) {
 // WORLD-SPACE WINDOW
 // -------------------------------------------------------
 
-int World::menuOptions[] = {24, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-0, 15, 16, 17, 18, 19, 20, 21, 22, 23};
-string World::menuText[] = {"    reset", "MODEL", "    Quad", "    Spiky Sphere", "    Car", "    Bunny", "    Cone", "    Cow", "    Cowboy Hat", "    Dragon", "    Chess", "    Temple", "    Cup", "    Space Shuttle", "    Sphere", "    None",
-"RENDERING", "    Lighting on/off", "    Texture on/off", "    Coordinate System on/off", "    Origin on/off",
+int World::menuOptions[] = {24, 25, 0, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+string World::menuText[] = {"    reset", "    reset to snapshot", "RENDERING", "    Render Scene (on/off)", "    Render KD-Tree (on/off)", "    Render Hits (on/off)", "    Colored Hits (on/off)", "    Coordinate System on/off", "    Origin on/off",
 "    Texture Coordinate Correction on/off  ", "    Texture Mode (WRAP/CLAMP) ", "    Environment mapping on/off", "    Move object/environment", "    Raytrace"};
 
 int World::numOptions = sizeof(World::menuOptions) / sizeof(World::menuOptions[0]);
@@ -450,7 +473,9 @@ void World::display(void) {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
 	glMultMatrixf(&cameraMatrix[0][0]);
+
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -486,27 +511,14 @@ void World::display(void) {
 		glPopMatrix();
 	}
 
-	// draw cursor
-	// XXX
-
-	// INSERT YOUR CODE HERE
-	glBegin(GL_LINES);
-	glColor3ub(255, 255, 0);
-	glVertex3f(0.0, 0.0, 0.0);
-	glVertex3f(cursor.x * 2.f, cursor.y * 2.f, cursor.z * 2.f);
-	glEnd();
-
-	// END XXX
-
-	glScalef(scaling, scaling, scaling);
-
-	if(!drawMesh) {
-		glutSwapBuffers();
-		return;
+	if(renderDots) {
+		raytracer.RenderPoints(coloredDots);
 	}
 
-	if(raytracer.m_tree) {
-	//	raytracer.m_tree->Render();
+	//glScalef(scaling, scaling, scaling);
+
+	if(renderKDTree) {
+		scene.RenderTree();
 	}
 
 	// draw the geometry
@@ -515,138 +527,17 @@ void World::display(void) {
 
 	mat4 modelMatrix = translate(mat4(1), vec3(shift.x, shift.y, shift.z));
 	modelMatrix *= rotation;
-	modelMatrix = scale(modelMatrix, vec3(scaling));
+	//modelMatrix = scale(modelMatrix, vec3(scaling));
 
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	if(environmentMapping) {
 
-		// set up the mirror
-		// REMEMBER when transforming: Environment appears mirrored in object
-
-		// calculate inverse of model matrix
-		// like this, environment appears centered around object initially
-		mat4 mirrorMatrix = inverse(modelMatrix);
-
-		// we're inside the sphere, have to invert all positions
-		// otherwise we'd be reflecting towards ourselves, and not to the viewer
-		mirrorMatrix = scale(mirrorMatrix, vec3(-1, -1, -1));
-		//translate to presumed original camera position
-		mirrorMatrix = translate(mat4(1), vec3(0, 0, cameraZMap)) * mirrorMatrix;
-
-		// pass matrices and flags to shader
-
-		// XXX 
-
-		// INSERT YOUR CODE HERE
-
-		sphereMapShader.bind();
-		sphereMapShader.setUniform("modelView", cameraMatrix * modelMatrix);
-		sphereMapShader.setUniform("normalMatrix", glm::transpose(glm::inverse(cameraMatrix * modelMatrix)));
-		sphereMapShader.setUniform("modelViewProjection", projectionMatrix * cameraMatrix * modelMatrix);
-
-		sphereMapShader.setUniform("mirrorMatrix", mirrorMatrix);
-		sphereMapShader.setUniform("mirrorNormalMatrix", glm::transpose(glm::inverse(mirrorMatrix)));
-
-		sphereMapShader.setUniform("viewMatrix", cameraMatrix);
-		sphereMapShader.setUniform("viewNormalMatrix", glm::transpose(glm::inverse(cameraMatrix)));
-		sphereMapShader.setUniform("viewProjectionMatrix", projectionMatrix * cameraMatrix);
-
-		sphereMapShader.setUniform("lighting", lighting);
-		sphereMapShader.setUniform("showTexture", showTexture);
-		sphereMapShader.setUniform("moveEnvironment", moveEnvironment);
-
-		sphereMapShader.setUniform("lightSource.position", lightSource.position);
-		sphereMapShader.setUniform("lightSource.ambient", lightSource.ambient);
-		sphereMapShader.setUniform("lightSource.diffuse", lightSource.diffuse);
-		sphereMapShader.setUniform("lightSource.specular", lightSource.specular);
-		sphereMapShader.setUniform("material.ambient", material.getAmbient());
-		sphereMapShader.setUniform("material.diffuse", material.getDiffuse());
-		sphereMapShader.setUniform("material.specular", material.getSpecular());
-		sphereMapShader.setUniform("material.shininess", material.getShininess());
-		texture.bind();
-		TriMesh* m = Resources::Get<TriMesh>(meshPath);
-		if(m) m->draw();
-		//mesh.draw();
-		texture.unbind();
-		sphereMapShader.unbind();
-
-		// END XXX
-	}
-
-	else if(drawRect) { // draw a textured quad
-
-		// pass matrices and flags to shader
-		// XXX
-
-		// INSERT YOUR CODE HERE     
-		quadShader.bind();
-		quadShader.setUniform("modelView", cameraMatrix * modelMatrix);
-		quadShader.setUniform("normalMatrix", glm::transpose(glm::inverse(cameraMatrix * modelMatrix)));
-		quadShader.setUniform("modelViewProjection", projectionMatrix * cameraMatrix * modelMatrix);
-		quadShader.setUniform("lighting", lighting);
-		quadShader.setUniform("showTexture", showTexture);
-		quadShader.setUniform("lightSource.position", lightSource.position);
-		quadShader.setUniform("lightSource.ambient", lightSource.ambient);
-		quadShader.setUniform("lightSource.diffuse", lightSource.diffuse);
-		quadShader.setUniform("lightSource.specular", lightSource.specular);
-		quadShader.setUniform("material.ambient", material.getAmbient());
-		quadShader.setUniform("material.diffuse", material.getDiffuse());
-		quadShader.setUniform("material.specular", material.getSpecular());
-		quadShader.setUniform("material.shininess", material.getShininess());
-		texture.bind();
-		TriMesh* m = Resources::Get<TriMesh>(meshPath);
-		if(m) m->draw();
-		//mesh.draw();
-		texture.unbind();
-		quadShader.unbind();
-
-		// END XXX
+	// Render the scene with the current matrices
+	if(renderScene)
+		scene.RenderScene(texturingShader, cameraMatrix * modelMatrix, projectionMatrix);
 
 
-	} else { // conventional texturing with texture coordinates calculated in TriMesh
-
-		// pass matrices and flags to shader
-
-		// XXX 
-
-		// INSERT YOUR CODE HERE
-
-
-		texturingShader.bind();
-		texturingShader.setUniform("modelView", cameraMatrix * modelMatrix);
-		texturingShader.setUniform("normalMatrix", glm::transpose(glm::inverse(cameraMatrix * modelMatrix)));
-		texturingShader.setUniform("modelViewProjection", projectionMatrix * cameraMatrix * modelMatrix);
-		texturingShader.setUniform("lighting", lighting);
-		texturingShader.setUniform("showTexture", showTexture);
-		texturingShader.setUniform("lightSource.position", lightSource.position);
-		texturingShader.setUniform("lightSource.ambient", lightSource.ambient);
-		texturingShader.setUniform("lightSource.diffuse", lightSource.diffuse);
-		texturingShader.setUniform("lightSource.specular", lightSource.specular);
-		texturingShader.setUniform("material.ambient", material.getAmbient());
-		texturingShader.setUniform("material.diffuse", material.getDiffuse());
-		texturingShader.setUniform("material.specular", material.getSpecular());
-		texturingShader.setUniform("material.shininess", material.getShininess());
-		texture.bind();
-		TriMesh* m = Resources::Get<TriMesh>(meshPath);
-		if(m) m->draw();
-		/*
-		mesh.draw();
-		*/
-		texture.unbind();
-		texturingShader.unbind();
-
-		// END XXX
-	}
-
-	// bind texture and draw mesh; then unbind everything
-
-	// XXX
-
-	// INSERT YOUR CODE HERE
-
-	// END XXX
 
 	glutSwapBuffers();
 }
@@ -717,65 +608,20 @@ void World::menu(int value) {
 		case 24:
 		reset();
 		break;
-		case 1:
-		// load rectangle
-		meshPath = quadPath;
-		raytracer.load(Resources::Get<TriMesh>(meshPath));
-		//mesh.loadOff(models[value]);
-		drawRect = true;
+		case 25:
+		snapshotReset();
 		break;
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
 		case 13:
-		// Check if we already loaded the model before
-		if(Resources::Get<TriMesh>(models[value]) != nullptr) {
-			meshPath = models[value];
-			raytracer.load(Resources::Get<TriMesh>(meshPath));
-		} else {
-			// Construct the loading description
-			desc.path = models[value];
-			desc.format = "off";
-			desc.name = desc.path;
-			desc.textureCorrection = textureCorrection;
-			if(models[value] == "data/bunny2.off" || models[value] == "data/cow.off" || models[value] == "data/cone.off") {
-				desc.winding = TriMesh::CW;
-			} else {
-				desc.winding = TriMesh::CCW;
-			}
-			desc.normalize = true;
-			desc.calculateVertexNormals = true;
-			desc.calculateSphereUVs = true;
-
-			// Load the model
-			try {
-				meshPath = desc.name;
-				Resources::Load<TriMesh>(desc);
-				raytracer.load(Resources::Get<TriMesh>(meshPath));
-			} catch(exception e) {
-				meshPath = "";
-				cout << e.what() << endl;
-			}
-		}
-		drawRect = false;
-		drawMesh = true;
+		renderScene = !renderScene;
 		break;
 		case 14:
-		drawMesh = false;
+		renderKDTree = !renderKDTree;
 		break;
 		case 15:
-		lighting = !lighting;
+		renderDots = !renderDots;
 		break;
 		case 16:
-		showTexture = !showTexture;
+		coloredDots = !coloredDots;
 		break;
 		case 17:
 		showCoordinates = !showCoordinates;
@@ -783,44 +629,15 @@ void World::menu(int value) {
 		case 18:
 		showOrigin = !showOrigin;
 		break;
-
 		case 19:
-		// enable/disable texture correction in Image (not obligatory, but useful for debugging)
-		//textureCorrection = !textureCorrection;
-		//mesh.correctTexture(textureCorrection);
-		//mesh.reload();
-		//mesh.center();
-		//mesh.unitize();
-		//mesh.computeNormals();
-		//mesh.computeSphereUVs();
-		//break;
-		//case 20:
-		//// set texture wrapping in Image (not obligatory, but useful for debugging)
-		//if(wrap == GL_REPEAT) {
-		//	wrap = GL_CLAMP_TO_BORDER;
-		//} else {
-		//	wrap = GL_REPEAT;
-		//}
-		//texture.setWrap(wrap);
 		break;
 		break;
 		case 21:
-		environmentMapping = !environmentMapping;
-		if(!environmentMapping) moveEnvironment = false;
 		break;
 		case 22:
-		reset();
-		moveEnvironment = !moveEnvironment;
 		break;
 		case 23:
-		Context::displayWorldWindow();
-		glGetFloatv(GL_PROJECTION_MATRIX, &projection[0][0]);
-		//glGetFloatv(GL_MODELVIEW, &modelView[0][0]);
-		modelMatrix = translate(mat4(1), vec3(shift.x, shift.y, shift.z));
-		modelMatrix *= rotation;
-		modelMatrix = scale(modelMatrix, vec3(scaling));
-		traceTexture = raytracer.raytrace(screen.x, screen.y, glm::vec4(0, 0, screen.x, screen.y), cameraMatrix * modelMatrix, projection, 1.f);
-		Context::displayTextureWindow();
+		Raytrace();
 		break;
 		default:
 		break;
@@ -829,11 +646,43 @@ void World::menu(int value) {
 }
 
 void World::setupLight() {
-	lightSource.position = glm::vec4(1.7f, 0.f, 0.f, 1.f);
-	lightSource.ambient = glm::vec4(0.0f, 0.1f, 0.0f, 1.f);
-	lightSource.diffuse = glm::vec4(0.f, 1.f, 0.f, 1.f);
-	lightSource.specular = glm::vec4(1.f, 1.f, 1.f, 1.f);
+	lightSource.position = glm::vec4(1.5f, 0.f, 0.f, 1.f);
+	lightSource.ambient = glm::vec4(0.2f, 0.2f, 0.2f, 1.f);
+	lightSource.diffuse = glm::vec4(1.f, 1.f, 1.f, 1.f);
 }
 void World::setupMaterial() {
-	material = Material(vec4(1, 1,1, 1), vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), 50);
+	material = Material(vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), vec4(1, 1, 1, 1), 50);
+}
+void World::Raytrace() {
+	// Redisplay the world window
+	Context::displayWorldWindow();
+
+	// Get the desired matrices
+	glm::mat4 projection;
+	glm::mat4 modelMatrix = translate(mat4(1), vec3(shift.x, shift.y, shift.z));
+	modelMatrix *= rotation;
+	//modelMatrix = scale(modelMatrix, vec3(scaling));
+	glGetFloatv(GL_PROJECTION_MATRIX, &projection[0][0]);
+
+	// Save snapshot of the model transformation
+	snapshotRotation = rotation;
+	snapshotShift = shift;
+	//snapshotScaling = scaling;
+
+	auto t = timeGetTime();
+
+	// Raytrace the scene
+	raytracer.SetWindowSize(screen.x, screen.y);
+	raytracer.SetSamplingRate(samplingRate);
+	raytracer.SetMatrices(cameraMatrix * modelMatrix, projection);
+	raytracer.SetRecursionDepth(recursionDepth);
+	traceTexture = raytracer.Raytrace(scene);
+
+	float sec = timeGetTime() - t;
+
+	cout << "Scene Raytraced : " << to_string(sec) << "s" << endl;
+
+
+	// Redisplay the texture window
+	Context::displayTextureWindow();
 }

@@ -28,7 +28,7 @@
 
 
 
-class Image{
+class Image {
 	class MipMap {
 	public:
 		inline MipMap(std::vector<glm::vec4> data, int lod, int width, int height) {
@@ -84,18 +84,14 @@ public:
   // generate OpenGL texture
   void generateTexture();
 
-  // draw in texture
-  void paint(float x, float y);
-
-  // erase drawing from texture
-  void erase(float x, float y);
-
   inline int getWidth() const {
 	  return width;
   }
   inline int getHeight() const {
 	  return height;
   }
+
+  glm::vec4 Image::Sample(float u, float v);
 
 protected:
 

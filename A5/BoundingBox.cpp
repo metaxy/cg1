@@ -1,11 +1,13 @@
 #include "BoundingBox.hpp"
 
+#include <limits>
 #include <math.h>
 
 using namespace std;
 
 BoundingBox::BoundingBox() :
-m_min(glm::vec3(0, 0, 0)), m_max(glm::vec3(0, 0, 0)){
+m_min(glm::vec3(numeric_limits<float>::max(), numeric_limits<float>::max(), numeric_limits<float>::max())), 
+m_max(glm::vec3(-numeric_limits<float>::max(), -numeric_limits<float>::max(), -numeric_limits<float>::max())) {
 }
 BoundingBox::BoundingBox(const glm::vec3& min, const glm::vec3& max)
 : m_min(min), m_max(max) {

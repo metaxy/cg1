@@ -22,10 +22,10 @@ class Window{
 
   void redisplay(void);
 
- protected:
-
   // make id current
   void select(void);
+
+protected:
 
   // parent window
   Window *parent;

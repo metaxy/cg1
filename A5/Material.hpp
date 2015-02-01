@@ -38,6 +38,10 @@ public:
 		return m_shininess;
 	}
 
+	inline static Material Standard() {
+		return Material(glm::vec4(0.3, 0.3, 0.3, 1), glm::vec4(0.3, 0.3, 0.3, 1), glm::vec4(0.3, 0.3, 0.3, 1), 50);
+	}
+
 private:
 	// ambient color
 	glm::vec4 m_ambient;

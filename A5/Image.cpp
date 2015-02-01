@@ -12,6 +12,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <math.h>
 
 #include "Image.hpp"
 #include "Context.hpp"
@@ -180,39 +181,6 @@ vec4 Image::get(unsigned int x, unsigned int y) {
 	return data[x + y*this->getWidth()];
 }
 
-// draw in texture
-// XXX: NEEDS TO BE IMPLEMENTED
-void Image::paint(float x, float y) {
-	// XXX
-
-	// INSERT YOUR CODE HERE
-	vec4 color(1.0f, 0.f, 0.627f, 0.9f);
-	bind();
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x - 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y - 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x + 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y + 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	unbind();
-	// END XXX
-}
-
-
-void Image::erase(float x, float y) {
-	bind(); 
-	vec4 color = get(x, y);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	color = get(x - 1, y);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x - 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	color = get(x, y - 1);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y - 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	color = get(x + 1, y);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x + 1, y, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	color = get(x, y + 1);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, x, y + 1, 1, 1, GL_RGBA, GL_FLOAT, &color);
-	unbind();
-}
-
 void Image::load(const std::string& filename) {
 	data.clear();
 
@@ -277,4 +245,29 @@ void Image::loadPPM(const std::string& filename) {
 	raw.clear();
 
 	std::cout << "Image " << filename << " loaded. width=" << width << " height=" << height << endl;
+}
+
+vec4 Image::Sample(float u, float v) {
+	if(data.empty())
+		return vec4(0.f, 0.f, 0.f, 1.f);
+
+	u = clamp(u, 0.f, 1.f);
+	v = clamp(v, 0.f, 1.f);
+
+	int px1 = u * width;
+	int px2 = std::ceil(u*width);
+	int py1 = v * height;
+	int py2 = std::ceil(v*height);
+
+	// Determin interpolation parameters
+	float s = px2 / (float)width - u;
+	float t = py2 / (float)height - v;
+
+	// Interpolate the color bilinear
+	vec4 color =
+		s * (t * (get(px1, py1)) + (1 - t) * (get(px1, py2))) +
+		(1 - s) * (t * (get(px2, py1)) + (1 - t) * (get(px2, py2)));
+
+	// Return the color
+	return color;
 }

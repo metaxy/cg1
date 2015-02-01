@@ -3,45 +3,63 @@
 #include <math.h>
 #include <memory>
 #include <vector>
-#include <unordered_map>
+#include <mutex>
 #include "KDTree.hpp"
+#include "Ray.hpp"
 #include "TriMesh.hpp"
 #include "Triangle.hpp"
 #include "Image.hpp"
 
-class Ray;
+class Scene;
 
 class Raytracer {
+	struct WindowInfo {
+		WindowInfo()
+			: samplingRate(1.f), winX(0.f), winY(0.f), isWinDirty(false), isMatDirty(false) {
+		}
+		float samplingRate;
+		float winX;
+		float winY;
+
+		glm::mat4 modelView;
+		glm::mat4 projection;
+
+		int raysX;
+		int raysY;
+
+		bool isWinDirty;
+		bool isMatDirty;
+	};
+
 public:
-	inline Raytracer() {
-	}
+	Raytracer();
 	~Raytracer();
 
-	void load(TriMesh* mesh);
+	Image* Raytrace(Scene& scene);
 
-	Image* raytrace(float winX, float winY, const glm::vec4& viewport,
-								 const glm::mat4& modelView, const glm::mat4& projection,
-								 const float rate);
+	void RenderPoints(bool colored);
 
+	void SetMatrices(const glm::mat4& modelView, const glm::mat4& projection);
+	void SetRecursionDepth(int value);
+	void SetSamplingRate(float rate);
+	void SetWindowSize(float winX, float winY);
 
 private:
-	void createPrimaryRays(float winX, float winY, const glm::vec4& viewport,
-						   const glm::mat4& modelView, const glm::mat4& projection,
-						   const float rate);
-	void buildImage(float winX, float winY);
+	glm::vec4 CastRay(Scene& scene, const Ray& r, Ray::HitInfo& info, int depth);
 
-	void clearTriangles();
-	void clearRays();
-	glm::vec4 blinnPhong(glm::vec4 position, glm::vec3 normal);
-//private:
+	void CreatePrimaryRays();
+	void DeleteRays();
+
+	void BuildImage(float winX, float winY);
+	//private:
 public:
-	std::vector<Triangle*> m_triangles;
-	std::unique_ptr<KDTree> m_tree;
-	std::vector<Ray*> m_rays;
-	std::unordered_map<int, std::vector<Ray*>> m_rays2;
-
-
 	// Image information
 	std::vector<glm::vec4> m_data;
 	Image m_image;
+
+	// Raytracing information
+	std::vector<Ray> m_rays;
+	std::vector<glm::vec3> m_points;
+	WindowInfo m_winInfo;
+	int m_recursionDepth;
 };

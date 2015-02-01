@@ -28,14 +28,18 @@
 // http://glm.g-truc.net
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtx/unsigned_int.hpp"
+#include "PoolResource.hpp"
 
 #include <string>
+
+class Triangle;
 
 /*
  * Class for a simple triangle mesh represented as an indexed face set
  */
-class TriMesh{
+class TriMesh : public PoolResource<TriMesh> {
 	friend class Raytracer;
+	friend class Scene;
 
 public:
 	// clockwise / counter-clockwise?
@@ -44,6 +48,7 @@ public:
 		CCW
 	};
 public:
+	// Classis for loading this model
 	struct LoadDesc {
 		std::string path;
 		std::string format;
@@ -67,6 +72,7 @@ public:
 		static void calculateBoundingSphere(TriMesh* mesh);
 		static void calculateBoundingBox(TriMesh* mesh);
 	};
+
 public:
   // default constructor
   TriMesh();
@@ -95,7 +101,7 @@ protected:
   std::vector <glm::vec3> faceNormals;
   // indices of the faces
   std::vector<glm::uvec3> faces;
-
+  // Need this list for loading
   std::vector<std::vector<int>> vertexFaceIndices;
 
   // radius of boundingSphere

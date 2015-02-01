@@ -31,6 +31,13 @@ public:
 	}
 	template <>
 	static bool intersect<BoundingBox, Ray>(const BoundingBox& obj1, const Ray& obj2, glm::vec3* point) {
+		//if(obj1.getMax().x < obj1.getMin().x ||
+		//   obj1.getMax().y < obj1.getMin().y || 
+		//   obj1.getMax().z < obj1.getMin().z) {
+		//	// The bounding box is invalid since it is not initialized
+		//	// or was falsely initalized
+		//	return false;
+		//}
 		float k1 = (obj1.getMin().x - obj2.origin().x) / obj2.direction().x;
 		float k2 = (obj1.getMax().x - obj2.origin().x) / obj2.direction().x;
 		float k3 = (obj1.getMin().y - obj2.origin().y) / obj2.direction().y;

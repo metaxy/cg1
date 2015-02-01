@@ -13,6 +13,7 @@
     <ClCompile Include="Raytracer.cpp" />
     <ClCompile Include="Resources.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.hpp" />
@@ -31,10 +32,18 @@
     <ClInclude Include="Raytracer.hpp" />
     <ClInclude Include="Resources.hpp" />
     <ClInclude Include="Intersector.hpp" />
+    <ClInclude Include="PoolResource.hpp" />
+    <ClInclude Include="Scene.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
       <UniqueIdentifier>{b2242fd1-669a-4e17-8e68-a39be8549ac2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{fabcdd75-909c-4549-b211-07253be66b33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Meshes">
+      <UniqueIdentifier>{a0b9a8bb-771b-4d3c-8f62-fdc14955a524}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -47,23 +56,183 @@
     <None Include="shaders\flatQuad.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\quad.frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shaders\quad.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="shaders\texturing.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shaders\texturing.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shaders\sphereMap.frag">
-      <Filter>Shaders</Filter>
+    <None Include="data\checker.ppm">
+      <Filter>Data</Filter>
     </None>
-    <None Include="shaders\sphereMap.vert">
-      <Filter>Shaders</Filter>
+    <None Include="data\checker2.ppm">
+      <Filter>Data</Filter>
     </None>
+    <None Include="data\checker3.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\checker4.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\checker5.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\earth2.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\earthbump1k.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\earthbump1k_2.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\earthcyl2.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\earthlights.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\fine.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\flowers.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\grid.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\grid_normals.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\lines.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\marble.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\saturncyl1.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\supernova.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\waterbump.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\wood.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\world.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\worldbump.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="data\worldspec.ppm">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="meshes\auto.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\bialetti.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\bunny.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\bunnysimple.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\camel_head.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\cow.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\dice.mtl">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\dice.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\dragon.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\drei.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\eight.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\europemap.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\hand.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\heptoroid.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\homer.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\killeroo.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\lightcycle.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\lucy.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\mannequin.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\plane4x4.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\quad.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\spaceshuttle.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\sphere.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\sphere_2.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\tasse.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\teapot.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\tempel.off">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\torus_tri.off">
+      <Filter>Meshes</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="data\world.jpg">
+      <Filter>Data</Filter>
+    </Image>
+    <Image Include="data\worldspec.png">
+      <Filter>Data</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="meshes\dice.obj">
+      <Filter>Meshes</Filter>
+    </Object>
+    <Object Include="meshes\lightcycle.obj">
+      <Filter>Meshes</Filter>
+    </Object>
+    <Object Include="meshes\quad.obj">
+      <Filter>Meshes</Filter>
+    </Object>
   </ItemGroup>
 </Project>

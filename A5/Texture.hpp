@@ -57,4 +57,5 @@ namespace World{
 
   void setupLight();
   void setupMaterial();
+  void Raytrace();
 };

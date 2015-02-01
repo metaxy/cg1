@@ -6,12 +6,12 @@ class Triangle;
 
 class Ray {
 public:
-	struct RayHit {
-		RayHit(Triangle* tri = nullptr, glm::vec3 coords = glm::vec3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()))
-			: t(tri), bcoords(coords) {
+	struct HitInfo {
+		HitInfo(Triangle* tri = nullptr, glm::vec3 coords = glm::vec3(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()))
+			: triangle(tri), bcoords(coords) {
 		}
 
-		Triangle* t;
+		Triangle* triangle;
 		glm::vec3 bcoords;
 	};
 public:
@@ -24,7 +24,13 @@ public:
 	inline glm::vec3 origin() const {
 		return m_origin;
 	}
+	inline glm::vec3& origin() {
+		return m_origin;
+	}
 	inline glm::vec3 direction() const {
+		return m_direction;
+	}
+	inline glm::vec3& direction() {
 		return m_direction;
 	}
 

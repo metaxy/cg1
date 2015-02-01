@@ -1,167 +1,239 @@
 #include "Raytracer.hpp"
 
+#include <assert.h>
+#include <math.h>
+#include <vector>
+#include <thread>
+
 #include "glm\glm\glm.hpp"
 #include "glm\glm\gtc\matrix_transform.hpp"
 #include "Ray.hpp"
 #include "Image.hpp"
 #include "Intersector.hpp"
 #include "Texture.hpp"
+#include "Scene.hpp"
 
-void Raytracer::load(TriMesh* mesh) {
-	clearTriangles();
+using namespace glm;
+using namespace std;
 
-	for each(glm::vec3 f in mesh->faces) {
-		Triangle* t = new Triangle(
-			mesh->positions[f.x],
-			mesh->positions[f.y],
-			mesh->positions[f.z]
-			);
+//const int MAX_DEPTH = 3;
 
-		// Add the uv coordinates if existing
-		if(!mesh->texCoords.empty()) {
-			t->uv(0) = mesh->texCoords[f.x];
-			t->uv(1) = mesh->texCoords[f.y];
-			t->uv(2) = mesh->texCoords[f.z];
-		}
-
-		// Calculate the face normal by interpolating the vertex normals
-		if(!mesh->normals.empty()) {
-			// Midpoint has barycentric coordinates a = b = c = 1/3
-			t->normal() = 1.f / 3.f * (mesh->normals[f.x] + mesh->normals[f.y] + mesh->normals[f.z]);
-		}
-
-		m_triangles.push_back(t);
-	}
-
-	m_tree.reset(new KDTree(m_triangles));
+Raytracer::Raytracer()
+	: m_recursionDepth(0) {
 }
 Raytracer::~Raytracer() {
-	// TODO: Triangles zerstören
-	clearTriangles();
-	// TODO: Rays zerstören
-	clearRays();
+	DeleteRays();
 }
 
-Image* Raytracer::raytrace(float winX, float winY, const glm::vec4& viewport,
-						   const glm::mat4& modelView, const glm::mat4& projection,
-						   const float rate) {
-	// Clear rays
-	clearRays();
-
+Image* Raytracer::Raytrace(Scene& scene) {
 	// Create the rays
-	createPrimaryRays(winX, winY, viewport, modelView, projection, rate);
+	CreatePrimaryRays();
+	assert(!m_rays.empty());
 
-	// Clear the data array
-	m_data.clear();
-	m_data.resize(winX * winY);
-	//m_data = std::vector<glm::vec4>();
+	// Resize the data array for our needs
+	m_data.resize(m_winInfo.raysX * m_winInfo.raysY);
 
-	for(int y = 0; y < winY; ++y) {
-		for(int x = 0; x < winX; ++x) {
-			glm::vec4 color;
+	// Clear the vector of hitpoints
+	m_points.resize(m_winInfo.raysX * m_winInfo.raysY);
 
-				Ray* r = m_rays[y*winX + x];
+	// Shoot the rays into the scene
+	for(int y = 0; y < m_winInfo.raysY; ++y) {
+		for(int x = 0; x < m_winInfo.raysX; ++x) {
+			// Construct a hit info struct for this ray
+			Ray::HitInfo info;
 
-				Triangle* hitTriangle = nullptr;
-				
+			// Shoot the ray into the scene
+			glm::vec4 color = CastRay(scene, m_rays[y * m_winInfo.raysX + x], info, 0);
 
-				auto hit = m_tree->hit(*r);
-				hitTriangle = hit.t;
-				if(hitTriangle) {
-					auto light = blinnPhong(modelView * glm::vec4(r->origin() + r->direction()*hit.bcoords.x, 1), 
-											glm::vec3(glm::transpose(glm::inverse(modelView)) * glm::vec4(hit.t->normal(), 1)));
-					
-					// Add specular
-					
-					// Shadow ray
-					glm::vec3 point = r->origin() + r->direction()*hit.bcoords.x;
-					glm::vec3 toLight = glm::normalize(glm::vec3(glm::inverse(modelView) * World::lightSource.position) - point);
-					Ray sr(point + hit.t->normal() * 0.0001f, toLight);
-
-					auto lh = m_tree->hit(sr);
-					if(lh.t) {
-						color = glm::vec4(0.4f, 0.4f, 0.4f, 1.f) * light;
-					} else {
-						color += glm::vec4(1.f, 1.f, 1.0f, 1.f) * light;
-					}
-				}
-			
-				
-
-			m_data[y * winX + x] = color / rate;
+			// Store the color returned by the ray
+			m_data[y * m_winInfo.raysX + x] = color;
+			m_points[y * m_winInfo.raysX + x] = m_rays[y * m_winInfo.raysX + x].origin() +
+				m_rays[y * m_winInfo.raysX + x].direction() * info.bcoords.x;
 		}
 	}
 
-	if(!m_data.empty()) {
-		buildImage(winX, winY);
-	} else {
-		throw std::exception("Fucked.");
-	}
+	// Build up an OpenGL image from the data
+	assert(!m_data.empty());
+	BuildImage(m_winInfo.raysX, m_winInfo.raysY);
 
 	return &m_image;
 }
 
+void Raytracer::RenderPoints(bool colored) {
+	glColor3f(1.0, 0.0, 0.0);
+	glPushMatrix();
+	glBegin(GL_POINTS);
 
-void Raytracer::createPrimaryRays(float winX, float winY, const glm::vec4& viewport,
-								  const glm::mat4& modelView, const glm::mat4& projection,
-								  const float rate) {
-/*	if(m_rays.size() != winX * winY) {
-		for each(Ray* r in m_rays) {
-			delete r;
+	for(int y = 0; y < m_winInfo.raysY; ++y) {
+		for(int x = 0; x < m_winInfo.raysX; ++x) {
+			if(colored) {
+				glm::vec4 color = m_data[y * m_winInfo.raysX + x];
+				glColor3f(color.x, color.y, color.z);
+			}
+			
+			glm::vec3 point = m_points[y * m_winInfo.raysX + x];
+			glVertex3f(point.x, point.y, point.z);
+		}
+	}
+
+	/*for each(glm::vec3 p in m_points) {
+		if(colored) {
+
 		}
 
-		m_rays.clear();
-	}*/ // * rate
-	//m_rays2.clear();
-	float stepWidth = 1. / rate;
-	for(float y = 0.f; y < winY; y += stepWidth)
-		for(float x = 0.f; x < winX; x += stepWidth) {
+		glVertex3f(p.x, p.y, p.z);
+	}*/
+	glEnd();
+	glPopMatrix();
+}
+
+glm::vec4 Raytracer::CastRay(Scene& scene, const Ray& r, Ray::HitInfo& info, int depth) {
+	glm::vec4 color = vec4(0.0f, 0.0f, 0.0f, 1.f);;
+
+	//sceneMut.lock();
+	bool priHit = scene.Hit(r, info);
+	//sceneMut.unlock();
+
+	if(priHit) {
+		// Add the hitpoint to the list of points
+		glm::vec3 primaryPoint = r.origin() + r.direction() * info.bcoords.x;
+
+		// Get the current triangle and the current material
+		Triangle * currentTri = info.triangle;
+		Material* currentMat = scene.m_objects[currentTri->oid()].material;
+
+		// Interpolate the normal at the current point
+		float bu = info.bcoords.y;
+		float bv = info.bcoords.z;
+		float bw = 1 - bu - bv;
+		glm::vec3 inormal = normalize(
+			bw * currentTri->vNormal(0) + bu * currentTri->vNormal(1) + bv * currentTri->vNormal(2));
+
+		bool lighting = true;
+		glm::vec4 lightIntensity;
+		if(lighting) {
+			// Get the light array
+			vector<Light*> lights = scene.m_lights;
+
+			// Now calculate the factory of every light
+			for(int lightID = 0; lightID < lights.size(); ++lightID) {
+				Light* currentLight = scene.m_lights[lightID];
+
+				auto light = currentLight->BlinnPhong(vec4(primaryPoint, 1),
+													  inormal, currentMat);
+				// Shadow ray
+				glm::vec3 point = primaryPoint + inormal * 0.001f;
+				//glm::vec3 toLight = glm::normalize(glm::vec3(glm::inverse(m_winInfo.modelView) * World::lightSource.position) - point);
+				glm::vec3 toLight = glm::vec3(currentLight->position) - point;
+				Ray sr(point, glm::normalize(toLight));
+
+				Ray::HitInfo lightSensorHit;
+
+				glm::vec4 partColor;
+				if(scene.Hit(sr, lightSensorHit)) {
+					partColor =
+						currentMat->getAmbient() *
+						currentLight->ambient;
+					//glm::vec4(0.1f, 0.1f, 0.1f, 1.f) * light;
+					partColor *= 1.f / lights.size();
+				} else {
+					partColor = light;
+					partColor *= 1.f / lights.size();
+				}
+
+				lightIntensity += partColor;
+			}
+		}
+
+		color = lightIntensity;
+		color /= (depth + 1);
+
+		// Recursively cast another ray
+		if(depth < m_recursionDepth) {
+			Ray reflection;
+			Ray::HitInfo recursiveInfo;
+			reflection.direction() = normalize(glm::reflect(r.direction(), inormal));
+			reflection.origin() = primaryPoint + inormal * 0.001f;
+			color += CastRay(scene, reflection, recursiveInfo, depth + 1) * currentMat->getSpecular();
+		}
+	} else {
+		color = vec4(0.01f, 0.01f, 0.01f, 1.f);
+	}
+
+	return color;
+}
+
+void Raytracer::CreatePrimaryRays() {
+	// Nothing to do here since nothing changed
+	if(!m_winInfo.isWinDirty && !m_winInfo.isMatDirty)
+		return;
+
+	if(m_winInfo.isWinDirty) {
+		DeleteRays();
+
+		m_winInfo.raysX = std::ceil(m_winInfo.winX * m_winInfo.samplingRate);
+		m_winInfo.raysY = std::ceil(m_winInfo.winY * m_winInfo.samplingRate);
+		m_rays.resize(m_winInfo.raysX * m_winInfo.raysY);
+	}
+
+	for(int y = 0; y < m_winInfo.raysY; ++y)
+		for(int x = 0; x < m_winInfo.raysX; ++x) {
 			glm::vec3 direction;
 			glm::vec3 origin;
 			glm::vec3 camera;
-			camera = glm::vec3(glm::inverse(modelView) * glm::vec4(0.f, 0.f, 0.f, 1.f));
-			origin = glm::unProject(glm::vec3(x, y, 0), modelView, projection, glm::vec4(0, 0, winX, winY));
+			camera = glm::vec3(glm::inverse(m_winInfo.modelView) * glm::vec4(0.f, 0.f, 0.f, 1.f));
+			origin = glm::unProject(glm::vec3(x, y, 0),
+									m_winInfo.modelView, m_winInfo.projection,
+									glm::vec4(0, 0, m_winInfo.raysX, m_winInfo.raysY));
 			direction = origin - camera;
-			
-			m_rays.push_back(new Ray(origin, direction));
+
+			//if(m_winInfo.isWinDirty) {
+			//	// The window was dirty, so recreate the rays
+			//	m_rays[y * m_winInfo.raysX + x] = new Ray(origin, direction);
+			//} else {
+			//	// Only the matrices were dirty, so change the ray orientation
+			//	m_rays[y * m_winInfo.raysX + x]->origin() = origin;
+			//	m_rays[y * m_winInfo.raysX + x]->direction() = direction;
+			//}
+			m_rays[y * m_winInfo.raysX + x].origin() = origin;
+			m_rays[y * m_winInfo.raysX + x].direction() = direction;
 		}
+
+	m_winInfo.isWinDirty = false;
+	m_winInfo.isMatDirty = false;
 }
-void Raytracer::buildImage(float winX, float winY) {
+void Raytracer::DeleteRays() {
+	/*for each(Ray* r in m_rays) {
+		delete r;
+		}*/
+}
+
+void Raytracer::BuildImage(float winX, float winY) {
 	// TODO: Use the sample rate
 	m_image.load(m_data, winX, winY);
 	m_image.generateTexture();
 }
 
-void Raytracer::clearTriangles() {
-	for each(Triangle* t in m_triangles) {
-		delete t;
+void Raytracer::SetWindowSize(float winX, float winY) {
+	if(winX != m_winInfo.winX || winY != m_winInfo.winY) {
+		m_winInfo.winX = winX;
+		m_winInfo.winY = winY;
+		m_winInfo.isWinDirty = true;
 	}
-
-	m_triangles.clear();
 }
-void Raytracer::clearRays() {
-	// TODO: Improve
-
-	for each(Ray* r in m_rays) {
-		delete r;
+void Raytracer::SetSamplingRate(float rate) {
+	if(rate != m_winInfo.samplingRate) {
+		m_winInfo.samplingRate = rate;
+		m_winInfo.isWinDirty = true;
 	}
-
-	m_rays.clear();
-
 }
-
-glm::vec4 Raytracer::blinnPhong(glm::vec4 position, glm::vec3 normal) {
-	// Calculate the ambient color
-	glm::vec4 ambientColor = World::lightSource.ambient * World::material.getAmbient();
-
-	// Calculate the light direction and the strength of the diffuse light
-	glm::vec3 lightDirection = glm::normalize(glm::vec3(World::lightSource.position) - glm::vec3(position));
-	float diffAngle = std::fmaxf(glm::dot(lightDirection, normal), 0.);
-
-	// Calculate the diffuse color
-	glm::vec4 diffuseColor = diffAngle * World::lightSource.diffuse * World::material.getDiffuse();
-
-	// Calculate the specular color
-	// Return the final color
-	return ambientColor + diffuseColor;
+void Raytracer::SetMatrices(const glm::mat4& modelView, const glm::mat4& projection) {
+	if(modelView != m_winInfo.modelView || projection != m_winInfo.projection) {
+		m_winInfo.modelView = modelView;
+		m_winInfo.projection = projection;
+		m_winInfo.isMatDirty = true;
+	}
+}
+void Raytracer::SetRecursionDepth(int value) {
+	m_recursionDepth = value;
 }

@@ -49,6 +49,14 @@ public:
 		assert(i >= 0 && i < 3);
 		return m_texCoords[i];
 	}
+	inline glm::vec3 vNormal(const int i) const {
+		assert(i >= 0 && i < 3);
+		return m_vNormals[i];
+	}
+	inline glm::vec3& vNormal(const int i) {
+		assert(i >= 0 && i < 3);
+		return m_vNormals[i];
+	}
 
 	inline glm::vec3 normal() const {
 		return m_normal;
@@ -56,10 +64,20 @@ public:
 	inline glm::vec3& normal() {
 		return m_normal;
 	}
+
+	inline int oid() const {
+		return m_objectID;
+	}
+	inline int& oid() {
+		return m_objectID;
+	}
 private:
 	glm::vec3 m_vertices[3];
 	glm::vec2 m_texCoords[3];
+	glm::vec3 m_vNormals[3];
 	glm::vec3 m_normal;
 
 	BoundingBox m_bbox;
+
+	int m_objectID;
 };

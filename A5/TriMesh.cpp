@@ -15,6 +15,8 @@
 #include <sstream>
 
 #include "glm\glm\gtc\constants.hpp"
+#include "Triangle.hpp"
+#include "Utils.hpp"
 
 // use this with care
 // might cause name collisions
@@ -79,7 +81,7 @@ TriMesh* TriMesh::Loader::load(const TriMesh::LoadDesc& desc) {
 		TriMesh::Loader::unitize(mesh);
 	}
 
-	if(desc.calculateVertexNormals)
+	if(desc.calculateVertexNormals && desc.format != "obj")
 		TriMesh::Loader::computeNormals(mesh);
 	if(desc.calculateSphereUVs)
 		TriMesh::Loader::computeSphereUVs(mesh, desc.textureCorrection);
@@ -94,7 +96,7 @@ TriMesh* TriMesh::Loader::loadOff(const TriMesh::LoadDesc& desc) {
 
 	if(!stream.is_open()) {
 		// File could not be opened
-		throw std::exception((string("[MeshLoader] Failed to open the file: ") + desc.path.c_str()).c_str());
+		throw std::exception((string("[TriMesh::Loader] Failed to open the file: ") + desc.path.c_str()).c_str());
 	}
 
 	// Create a new empty mesh
@@ -168,8 +170,87 @@ TriMesh* TriMesh::Loader::loadOff(const TriMesh::LoadDesc& desc) {
 	return mesh;
 }
 TriMesh* TriMesh::Loader::loadObj(const TriMesh::LoadDesc& desc) {
-	// Load an *.obj mesh
-	return nullptr;
+	// Open the file
+	std::fstream stream(desc.path, std::ios_base::in);
+
+	if(!stream.is_open()) {
+		// File could not be opened
+		throw std::exception((string("[TriMesh::Loader] Failed to open the file: ") + desc.path.c_str()).c_str());
+	}
+
+	int numVerticesRead = 0;
+	int numFacesRead = 0;
+	int numVertices = 0;
+	int numFaces = 0;
+
+	std::vector<string> chunks;
+
+	std::string line("");
+
+	TriMesh* mesh(nullptr);
+
+	while(getline(stream, line)) {
+		// Read the file line by line
+
+		// Handle empty lines
+		if(line.empty())
+			continue;
+
+		// Split the line by spaces into tokens
+		auto tokens = split(line, ' ');
+
+		// Get the command token
+		std::string command = tokens[0];
+		if(command == "o") {
+			// Ignore the given name of the mesh
+			mesh = new TriMesh();
+		} else if(command == "v") {
+			GLfloat x, y, z;
+			stringstream(tokens[1]) >> x;
+			stringstream(tokens[2]) >> y;
+			stringstream(tokens[3]) >> z;
+			mesh->positions.push_back(vec3(x, y, z));
+		} else if(command == "vn") {
+			GLfloat x, y, z;
+			stringstream(tokens[1]) >> x;
+			stringstream(tokens[2]) >> y;
+			stringstream(tokens[3]) >> z;
+			mesh->normals.push_back(vec3(x, y, z));
+		} else if(command == "f") {
+			// Read a face, make sure the winding is correct and add it to the list
+			GLuint a, b, c;
+			stringstream(tokens[1]) >> a;
+			stringstream(tokens[2]) >> b;
+			stringstream(tokens[3]) >> c;
+			--a;
+			--b;
+			--c;
+
+			if(desc.winding == TriMesh::PolygonWinding::CW) {
+				// Swap a and c face index
+				auto i = a;
+				a = c;
+				c = i;
+			}
+
+			mesh->faces.push_back(glm::uvec3(a, b, c));
+
+			// Compute the normal of the face
+			mesh->faceNormals.push_back(
+				glm::normalize(glm::cross(
+				(mesh->positions[b] - mesh->positions[a]),
+				(mesh->positions[c] - mesh->positions[a])
+				))
+				);
+		} else if(command == "vt") {
+			GLfloat u, v;
+			stringstream(tokens[1]) >> u;
+			stringstream(tokens[2]) >> v;
+			mesh->texCoords.push_back(vec2(u, v));
+		}
+	}
+
+	return mesh;
 }
 void TriMesh::Loader::center(TriMesh* mesh) {
 	TriMesh::Loader::calculateBoundingBox(mesh);

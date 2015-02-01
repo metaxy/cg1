@@ -29,4 +29,11 @@ namespace Context{
   // redisplay windows
   void displayTextureWindow(void);
   void displayWorldWindow(void);
+
+  // select glut bitmap font
+  void setFont(std::string name, int size);
+
+  // draw a string on the screen
+  void drawString(int x, int y, std::string s);
+  void drawString(int x, int y, int z, std::string s);
 };
