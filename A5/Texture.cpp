@@ -361,16 +361,16 @@ void Texture::menu(int value) {
 		case 14:
 		case 15:
 		case 16:
-		texture.load(textures[value]);
+		/*texture.load(textures[value]);
 		texture.generateTexture();
 		if(value < 6) environmentMapping = false;
-		else if(value < 13) environmentMapping = true;
+		else if(value < 13) environmentMapping = true;*/
 		break;
 		case 17:
-		drag = DRAW;
+		//drag = DRAW;
 		break;
 		case 18:
-		drag = ERASE;
+		//drag = ERASE;
 		break;
 
 		// add cases for texture filtering
