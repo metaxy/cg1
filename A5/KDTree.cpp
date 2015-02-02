@@ -31,69 +31,6 @@ KDTree::KDTree(const std::vector<Triangle*>& triangles) {
 	cout << "Avg Tris / Leaf : " << to_string(m_averageTrisPerLeave) << endl << endl;
 }
 
-//KDTree::KDNode* KDTree::build(const std::vector<Triangle*>& triangles, const int depth) {
-//	BoundingBox bbox;
-//
-//	glm::vec3 mid;
-//	//BoundingBox midBox;
-//	cout << to_string(depth) << endl;
-//	// Build the tree
-//	for each(Triangle* t in triangles) {
-//		bbox.expand(t->bbox());
-//		mid += t->mid();
-//		//BoundingBox b(t->mid(), t->mid());
-//		//midBox.expand(b);
-//	}
-//
-//	mid /= triangles.size();
-//
-//	//Axis axis = midBox.getLongestAxis();
-//	//mid = 0.5f * (midBox.getMin() + midBox.getMax());
-//	Axis axis = bbox.getLongestAxis();
-//	vector<Triangle*> left;
-//	vector<Triangle*> right;
-//	for each(Triangle* t in triangles) {
-//		switch(axis) {
-//			case(Axis::X) :
-//				(t->mid().x <= mid.x) ? left.push_back(t) : right.push_back(t);
-//				break;
-//			case(Axis::Y) :
-//				(t->mid().y <= mid.y) ? left.push_back(t) : right.push_back(t);
-//				break;
-//			case(Axis::Z) :
-//				(t->mid().z <= mid.z) ? left.push_back(t) : right.push_back(t);
-//				break;
-//		}
-//	}
-//
-//	KDNode* node = new KDNode();
-//
-//	// TODO: Empty node?!
-//	if(left.size() <= 30) { //|| depth > 10) {
-//		node->left = nullptr;
-//	} else {
-//		node->left.reset(build(left, depth + 1));
-//	}
-//	if(right.size() <= 30) {// || depth > 10) {
-//		node->right = nullptr;
-//	} else {
-//		node->right.reset(build(right, depth + 1));
-//	}
-//
-//	node->bbox = bbox;
-//
-//	if(node->left && node->right) {
-//		node->triangles = std::vector<Triangle*>();
-//	} else if(!node->left && node->right) {
-//		node->triangles = left;
-//	} else if(node->left && !node->right) {
-//		node->triangles = right;
-//	} else {
-//		node->triangles = triangles;
-//	}
-//
-//	return node;
-//}
 KDTree::KDNode* KDTree::build(const std::vector<Triangle*>& triangles, const int depth) {
 	// Create a new object for this node
 	KDNode* node = new KDNode();
@@ -159,7 +96,6 @@ KDTree::KDNode* KDTree::build(const std::vector<Triangle*>& triangles, const int
 void KDTree::Render() {
 	Render(m_head.get());
 }
-
 void KDTree::Render(KDNode* node) {
 	if(node == nullptr)
 		return;
@@ -179,52 +115,9 @@ void KDTree::Render(KDNode* node) {
 	Render(node->right.get());
 }
 
-//Ray::RayHit KDTree::hit(const Ray& r) {
-//	return hit(m_head.get(), r, 0);
-//}
 bool KDTree::hit(const Ray& r, Ray::HitInfo& rh) {
 	return hit(m_head.get(), r, rh, 0);
 }
-
-//Ray::RayHit KDTree::hit(KDNode* node, const Ray& r, const int depth) {
-//	Ray::RayHit fh;
-//
-//	if(node) {
-//		if(Intersector::intersect(node->bbox, r)) {
-//			// Try left
-//			Ray::RayHit lh = hit(node->left.get(), r, depth + 1);
-//
-//			// Try right
-//			Ray::RayHit rh = hit(node->right.get(), r, depth + 1);
-//
-//			// Try here
-//			Ray::RayHit hh;
-//
-//			for each(Triangle* t in node->triangles) {
-//				glm::vec3 newHitPoint;
-//
-//				if(!Intersector::intersect(r, *t, &newHitPoint))
-//					continue;
-//
-//				if(newHitPoint.x >= 0 && newHitPoint.x < hh.bcoords.x) {
-//					hh.t = t;
-//					hh.bcoords = newHitPoint;
-//				}
-//			}
-//
-//			if(hh.bcoords.x <= rh.bcoords.x && hh.bcoords.x <= lh.bcoords.x) {
-//				fh = hh;
-//			} else if(rh.bcoords.x <= hh.bcoords.x && rh.bcoords.x <= lh.bcoords.x) {
-//				fh = rh;
-//			} else if(lh.bcoords.x <= hh.bcoords.x && lh.bcoords.x <= rh.bcoords.x) {
-//				fh = lh;
-//			}
-//		}
-//
-//	}
-//
-//	return fh;
-//}
 bool KDTree::hit(KDNode* node, const Ray& r, Ray::HitInfo& rh, const int depth) {
 	if(!node)
 		return false;

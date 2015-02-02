@@ -16,6 +16,7 @@
 
 #include "Image.hpp"
 #include "Context.hpp"
+#include "Utils.hpp"
 
 using namespace std;
 using namespace glm;
@@ -44,7 +45,7 @@ Image::~Image() {
 
 // generate OpenGL texture
 void Image::generateTexture() {
-	
+
 	if(textureID == 0) {
 		// generate texture id
 		// XXX
@@ -56,7 +57,7 @@ void Image::generateTexture() {
 	}
 
 	this->bind();
-	
+
 
 	// texture filtering and repeat
 	// XXX
@@ -260,8 +261,8 @@ vec4 Image::Sample(float u, float v) {
 	int py2 = std::ceil(v*height);
 
 	// Determin interpolation parameters
-	float s = px2 / (float)width - u;
-	float t = py2 / (float)height - v;
+	float s = px2 / (float) width - u;
+	float t = py2 / (float) height - v;
 
 	// Interpolate the color bilinear
 	vec4 color =
@@ -270,4 +271,99 @@ vec4 Image::Sample(float u, float v) {
 
 	// Return the color
 	return color;
+}
+
+Image* Image::Loader::load(const Image::LoadDesc& desc) {
+	Image* image(nullptr);
+
+	switch(desc.mode) {
+		case(Image::LoadDesc::Mode::FILE) :
+			image = load(desc.path);
+			break;
+		case(Image::LoadDesc::Mode::MEMORY) :
+			image = load(desc.data, desc.size.x, desc.size.y);
+			break;
+		default: break;
+	}
+
+	return image;
+}
+Image* Image::Loader::load(const std::string& filename) {
+	Image* image(nullptr);
+
+	auto tokens = split(filename, '.');
+
+	string format = tokens[tokens.size() - 1];
+
+	if(format == "ppm") {
+		Image* image = new Image();
+		loadPPM(filename, image);
+	} else {
+		cerr << "file " << filename << " is not a PPM file" << endl;
+	}
+
+	if(image) {
+		image->generateTexture();
+	}
+
+	return image;
+}
+Image* Image::Loader::load(const std::vector<glm::vec4>* data, int width, int height) {
+	Image* image = new Image();
+	image->data = *data;
+	image->width = width;
+	image->height = height;
+	return image;
+}
+
+void Image::Loader::loadPPM(const std::string& filename, Image* image) {
+
+	ifstream file(filename.c_str(), ios::binary);
+
+	if(!file.is_open()) {
+		cerr << "opening file " << filename << " failed" << endl;
+		return;
+	}
+
+	// grab first two chars of the file and make sure that it has the
+	// correct magic cookie for a raw PPM file.
+	string magic;
+	getline(file, magic);
+	if(magic.substr(0, 2) != "P6") {
+		cerr << "File " << filename << " is not a raw PPM file" << endl;
+		return;
+	}
+
+	// grab the three elements in the header (width, height, maxval).
+	string dimensions;
+	do {
+		getline(file, dimensions);
+	} while(dimensions[0] == '#');
+
+	stringstream(dimensions) >> image->width >> image->height;
+
+	string max;
+	getline(file, max);
+	int maxValue;
+	stringstream(max) >> maxValue;
+	// grab all the image data in one fell swoop.
+	vector<char> raw(image->width*image->height * 3);
+	file.read(&raw[0], raw.capacity());
+	file.close();
+
+	image->data.resize(image->width*image->height);
+	for(int y = 0; y < image->height; y++) {
+		for(int x = 0; x < image->width; x++) {
+			image->data[y*image->width + x] = vec4((unsigned char) raw[(image->height - y - 1) * image->width * 3 + 3 * x], 
+												   (unsigned char) raw[(image->height - y - 1) * image->width * 3 + 3 * x + 1],
+												   (unsigned char) raw[(image->height - y - 1) * image->width * 3 + 3 * x + 2], 
+												   maxValue);
+			image->data[y*image->width + x] /= maxValue;
+			//cout << data[i].r << " " + data[i].g << " " + data[i].b << " " + data[i].a << endl;
+		}
+	}
+
+	raw.clear();
+
+	std::cout << "Image " << filename << " loaded. width=" << image->width << " height=" << image->height << endl;
 }

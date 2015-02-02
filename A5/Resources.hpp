@@ -19,8 +19,12 @@ public:
 	static void Load(typename const T::LoadDesc& desc) {
 		std::cout << "Loading " << desc.path << "...";
 		T* pObject = T::Loader::load(desc);
-		T::Add(pObject, desc.name);
-		std::cout << "done" << " [\"" << desc.name << "\"]" << std::endl;
+		if(!pObject) {
+			std::cerr << "error" << std::endl;
+		} else {
+			T::Add(pObject, desc.name);
+			std::cout << "done" << " [\"" << desc.name << "\"]" << std::endl;
+		}
 	}
 
 	/**** UNLOADING A RESOURCE ****/

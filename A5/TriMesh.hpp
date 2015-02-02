@@ -38,7 +38,6 @@ class Triangle;
  * Class for a simple triangle mesh represented as an indexed face set
  */
 class TriMesh : public PoolResource<TriMesh> {
-	friend class Raytracer;
 	friend class Scene;
 
 public:

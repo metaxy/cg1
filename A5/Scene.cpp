@@ -172,8 +172,8 @@ void Scene::BuildScene(Scene& scene) {
 					translate(vec3(0.f, 0.25f, 1.f)) * rotate(glm::quarter_pi<float>(), vec3(0.f, 1.f, 0.f)));*/
 	scene.AddLight(vec4(1.f, 2.f, 2.f, 1.f), 
 				   vec4(0.1f, 0.1f, 0.1f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f));
-	/*scene.AddLight(vec4(-3.f, 2.f, 1.5f, 1.f),
-				   vec4(0.0f, 0.0f, 0.0f, 1.f), vec4(0.1f, 0.1f, 0.1f, 1.f));*/
+	scene.AddLight(vec4(-3.f, 2.f, 1.5f, 1.f),
+				   vec4(0.f, 0.f, 0.f, 1.f), vec4(1.0f, 0.0f, 0.675f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f));
 
 	// Print some scene info
 	cout << "[Scene]" << endl;

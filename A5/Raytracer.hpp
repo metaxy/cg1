@@ -48,7 +48,6 @@ private:
 	glm::vec4 CastRay(Scene& scene, const Ray& r, Ray::HitInfo& info, int depth);
 
 	void CreatePrimaryRays();
-	void DeleteRays();
 
 	void BuildImage(float winX, float winY);
 	//private:

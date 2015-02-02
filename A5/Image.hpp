@@ -25,10 +25,11 @@
 #include <string>
 
 #include "glm/glm/glm.hpp"
+#include "PoolResource.hpp"
 
 
 
-class Image {
+class Image : public PoolResource<Image> {
 	class MipMap {
 	public:
 		inline MipMap(std::vector<glm::vec4> data, int lod, int width, int height) {
@@ -53,8 +54,31 @@ class Image {
 		int lod;
 		GLuint textureID;
 	};
-public:
 
+public:
+	struct LoadDesc {
+		enum Mode {UNKNOWN, MEMORY, FILE };
+
+		LoadDesc() {
+			mode = Mode::UNKNOWN;
+		}
+
+		std::string name;
+
+		Mode mode;
+		std::string path;
+		std::vector<glm::vec4>* data;
+		glm::vec2 size;
+	};
+	class Loader {
+	public:
+		static Image* load(const Image::LoadDesc& desc);
+	private:
+		static Image* load(const std::string& filename);
+		static Image* load(const std::vector<glm::vec4>* data, int width, int heigth);
+		// parse ppm format
+		static void loadPPM(const std::string& filename, Image* image);
+	};
   // constructors
   Image();
   Image(int width, int height);

@@ -10,6 +10,7 @@
 #include "Ray.hpp"
 #include "Image.hpp"
 #include "Intersector.hpp"
+#include "Resources.hpp"
 #include "Texture.hpp"
 #include "Scene.hpp"
 
@@ -22,7 +23,6 @@ Raytracer::Raytracer()
 	: m_recursionDepth(0) {
 }
 Raytracer::~Raytracer() {
-	DeleteRays();
 }
 
 Image* Raytracer::Raytrace(Scene& scene) {
@@ -56,6 +56,7 @@ Image* Raytracer::Raytrace(Scene& scene) {
 	assert(!m_data.empty());
 	BuildImage(m_winInfo.raysX, m_winInfo.raysY);
 
+	// 
 	return &m_image;
 }
 
@@ -76,13 +77,6 @@ void Raytracer::RenderPoints(bool colored) {
 		}
 	}
 
-	/*for each(glm::vec3 p in m_points) {
-		if(colored) {
-
-		}
-
-		glVertex3f(p.x, p.y, p.z);
-		}*/
 	glEnd();
 	glPopMatrix();
 }
@@ -140,10 +134,10 @@ glm::vec4 Raytracer::CastRay(Scene& scene, const Ray& r, Ray::HitInfo& info, int
 						currentMat->getAmbient() *
 						currentLight->ambient;
 					//glm::vec4(0.1f, 0.1f, 0.1f, 1.f) * light;
-					partColor *= 1.f / lights.size();
+					//partColor *= 1.f / lights.size();
 				} else {
 					partColor = light;
-					partColor *= 1.f / lights.size();
+					//partColor *= 1.f / lights.size();
 				}
 
 				lightIntensity += partColor;
@@ -151,7 +145,7 @@ glm::vec4 Raytracer::CastRay(Scene& scene, const Ray& r, Ray::HitInfo& info, int
 		}
 
 		color = lightIntensity;
-		color /= (depth + 1);
+		color /= (m_recursionDepth + 1);
 
 		// Recursively cast another ray
 		if(depth < m_recursionDepth) {
@@ -174,8 +168,6 @@ void Raytracer::CreatePrimaryRays() {
 		return;
 
 	if(m_winInfo.isWinDirty) {
-		DeleteRays();
-
 		m_winInfo.raysX = std::ceil(m_winInfo.winX * m_winInfo.samplingRate);
 		m_winInfo.raysY = std::ceil(m_winInfo.winY * m_winInfo.samplingRate);
 		m_rays.resize(m_winInfo.raysX * m_winInfo.raysY);
@@ -192,14 +184,6 @@ void Raytracer::CreatePrimaryRays() {
 									glm::vec4(0, 0, m_winInfo.raysX, m_winInfo.raysY));
 			direction = origin - camera;
 
-			//if(m_winInfo.isWinDirty) {
-			//	// The window was dirty, so recreate the rays
-			//	m_rays[y * m_winInfo.raysX + x] = new Ray(origin, direction);
-			//} else {
-			//	// Only the matrices were dirty, so change the ray orientation
-			//	m_rays[y * m_winInfo.raysX + x]->origin() = origin;
-			//	m_rays[y * m_winInfo.raysX + x]->direction() = direction;
-			//}
 			m_rays[y * m_winInfo.raysX + x].origin() = origin;
 			m_rays[y * m_winInfo.raysX + x].direction() = direction;
 		}
@@ -207,14 +191,15 @@ void Raytracer::CreatePrimaryRays() {
 	m_winInfo.isWinDirty = false;
 	m_winInfo.isMatDirty = false;
 }
-void Raytracer::DeleteRays() {
-	/*for each(Ray* r in m_rays) {
-		delete r;
-		}*/
-}
 
 void Raytracer::BuildImage(float winX, float winY) {
 	// TODO: Use the sample rate
+	/*Image::LoadDesc desc;
+	desc.name = "final_image";
+	desc.mode = Image::LoadDesc::MEMORY;
+	desc.data = &m_data;
+	desc.size = vec2(winX, winY);
+	Resources::Load<Image>(desc);*/
 	m_image.load(m_data, winX, winY);
 	m_image.generateTexture();
 }
