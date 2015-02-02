@@ -1,20 +1,22 @@
 #pragma once
 
 #include "glm\glm\glm.hpp"
+#include "PoolResource.hpp"
 
 #include <map>
 #include <string>
 
-class Material {
+class Material : public PoolResource<Material> {
 public:
 	struct LoadDesc {
+		std::string name;
 		std::string path;
 	};
 	class Loader {
 	public:
-		static std::map<std::string, Material*> load(const Material::LoadDesc& desc);
+		static Material* load(const Material::LoadDesc& desc);
 	private:
-		static std::map<std::string, Material*> loadMtl(const Material::LoadDesc& desc);
+		static Material* loadMtl(const Material::LoadDesc& desc);
 	};
 
 public:
@@ -23,6 +25,8 @@ public:
 					glm::vec4 specular = glm::vec4(),
 					float shininess = 0)
 					: m_ambient(ambient), m_diffuse(diffuse), m_specular(specular), m_shininess(shininess) {
+		// Vacuum
+		m_refraction = 1.f;
 	}
 
 	inline glm::vec4 getAmbient() const {
@@ -51,4 +55,6 @@ private:
 	glm::vec4 m_specular;
 	// shininess
 	float m_shininess;
+	// refraction factory
+	float m_refraction;
 };

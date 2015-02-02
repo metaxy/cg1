@@ -1,8 +1,8 @@
 #include "Material.hpp"
 
 #include <fstream>
-#include <map>
 #include <string>
+#include <vector>
 
 #include "glm\glm\glm.hpp"
 #include "glm\glm\gtc\constants.hpp"
@@ -11,31 +11,34 @@
 using namespace glm;
 using namespace std;
 
-map<string, Material*> Material::Loader::load(const Material::LoadDesc& desc) {
-	// We interpret every file as mtl file
+Material* Material::Loader::load(const Material::LoadDesc& desc) {
+	// Determin the file format
+	auto tokens = split(desc.path, '.');
+	string format = tokens[tokens.size() - 1];
+
+	//
+	Material* material(nullptr);
 
 	// Use the loader for the right format
-	//if(desc.format == "obj") {
-	map<string, Material*> materials = Material::Loader::loadMtl(desc);
-	/*} else {
-	throw std::exception((std::string("[MeshLoader] Can't load mesh with format: ") + desc.format).c_str());
-	}*/
+	if(format == "mtl") {
+		material = Material::Loader::loadMtl(desc);
+	} else {
+		throw std::exception((std::string("[Material::Loader] Can't load material with format: ") + format).c_str());
+	}
 
-	return materials;
+	return material;
 }
-map<string, Material*> Material::Loader::loadMtl(const Material::LoadDesc& desc) {
-	map<string, Material*> mats;
-
+Material* Material::Loader::loadMtl(const Material::LoadDesc& desc) {
 	// Open the material file
 	std::fstream stream(desc.path, std::ios_base::in);
 
 	if(!stream.is_open()) {
 		// File could not be opened
-		throw std::exception("[MaterialLoader] Failed to open the file");
+		throw std::exception(("[Material::Loader] Failed to open the file " + desc.path).c_str());
 	}
 
 	std::string line("");
-	Material* current(nullptr);
+	Material* material(nullptr);
 	while(getline(stream, line)) {
 		// Read the file line by line
 
@@ -54,43 +57,45 @@ map<string, Material*> Material::Loader::loadMtl(const Material::LoadDesc& desc)
 		std::string command = tokens[0];
 
 		if(command == "newmtl") {
+			assert(!material);
+
 			// Create a new material
-			current = new Material();
+			material = new Material();
 
 			// ATTENTION: We assume that there are not two materials with the same name in the same file
-			mats[tokens[1]] = current;
-		} else if(command == "Ns" && current) {
+			//mats[tokens[1]] = current;
+		} else if(command == "Ns" && material) {
 			std::stringstream ss(tokens[1]);
-			ss >> current->m_shininess;
-		} else if(command == "Ka" && current) {
+			ss >> material->m_shininess;
+		} else if(command == "Ka" && material) {
 			float r, g, b;
 			std::stringstream(tokens[1]) >> r;
 			std::stringstream(tokens[2]) >> g;
 			std::stringstream(tokens[3]) >> b;
 
-			current->m_ambient = glm::vec4(r, g, b, 1.f);
-		} else if(command == "Kd" && current) {
+			material->m_ambient = glm::vec4(r, g, b, 1.f);
+		} else if(command == "Kd" && material) {
 			float r, g, b;
 			std::stringstream(tokens[1]) >> r;
 			std::stringstream(tokens[2]) >> g;
 			std::stringstream(tokens[3]) >> b;
 
-			current->m_diffuse = glm::vec4(r, g, b, 1.f);
-		} else if(command == "Ks" && current) {
+			material->m_diffuse = glm::vec4(r, g, b, 1.f);
+		} else if(command == "Ks" && material) {
 			float r, g, b;
 			std::stringstream(tokens[1]) >> r;
 			std::stringstream(tokens[2]) >> g;
 			std::stringstream(tokens[3]) >> b;
 
-			current->m_specular = glm::vec4(r, g, b, 1.f);
-		} else if(command == "Ni" && current) {
-			// Ignore optical density
-		} else if(command == "d" && current) {
+			material->m_specular = glm::vec4(r, g, b, 1.f);
+		} else if(command == "Ni" && material) {
+			std::stringstream(tokens[1]) >> material->m_refraction;
+		} else if(command == "d" && material) {
 			// Ignore dissolving
 		} else {
 			// Unknown command
 		}
 	}
 
-	return mats;
+	return material;
 }

@@ -89,9 +89,6 @@ static GLfloat cameraZMap = 0;
 static GLfloat nearPlane;
 static GLfloat farPlane;
 
-static Image texture;
-static Image* traceTexture = nullptr;
-
 static vec3 cursor = vec3(1, 0, 0);
 
 static GLSLShader flatQuadShader;
@@ -170,10 +167,6 @@ void Common::loadModels() {
 		desc.calculateVertexNormals = true;
 		Resources::Load<TriMesh>(desc);
 
-		/*desc.path = "data/bialetti.off";
-		desc.name = "bialetti";
-		Resources::Load<TriMesh>(desc);*/
-
 		desc.path = "meshes/spaceshuttle.off";
 		desc.name = "shuttle";
 		Resources::Load<TriMesh>(desc);
@@ -181,6 +174,20 @@ void Common::loadModels() {
 		desc.path = "meshes/sphere.off";
 		desc.name = "sphere";
 		Resources::Load<TriMesh>(desc);
+
+		// Load the materials
+		Material::LoadDesc matDesc;
+		matDesc.name = "plastic";
+		matDesc.path = "meshes/plastic.mtl";
+		Resources::Load<Material>(matDesc);
+
+		matDesc.name = "mat1";
+		matDesc.path = "meshes/mat1.mtl";
+		Resources::Load<Material>(matDesc);
+
+		matDesc.name = "mat2";
+		matDesc.path = "meshes/mat2.mtl";
+		Resources::Load<Material>(matDesc);
 
 	} catch(exception& e) {
 		cout << e.what() << endl;
@@ -303,21 +310,23 @@ void Texture::display(void) {
 	// XXX
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	// Get the raytrace texture
+	Image* traceTexture = Resources::Get<Image>("final_image");
+
 	// INSERT YOUR CODE HERE
 	flatQuadShader.bind();
+
 	if(traceTexture != nullptr) {
 		traceTexture->bind();
-	} else {
-		texture.bind();
 	}
+
 	Resources::Get<TriMesh>("quad")->draw();
 	//	quad.draw();
 	flatQuadShader.unbind();
+
 	if(traceTexture != nullptr) {
 		traceTexture->unbind();
-	} else {
-		texture.unbind();
-	}
+	} 
 	// END XXX
 
 	glutSwapBuffers();
@@ -378,41 +387,35 @@ void Texture::menu(int value) {
 
 		// INSERT YOUR CODE HERE
 		case 19:
-		texture.setMagFilter(GL_NEAREST);
+		//texture.setMagFilter(GL_NEAREST);
 		break;
 		case 20:
-		texture.setMagFilter(GL_LINEAR);
+		//texture.setMagFilter(GL_LINEAR);
 		break;
 		case 21:
-		texture.setMinFilter(GL_NEAREST);
+		//texture.setMinFilter(GL_NEAREST);
 		break;
 		case 22:
-		texture.setMinFilter(GL_LINEAR);
+		//texture.setMinFilter(GL_LINEAR);
 		break;
 		case 23:
-		texture.setMinFilter(GL_NEAREST_MIPMAP_NEAREST);
+		//texture.setMinFilter(GL_NEAREST_MIPMAP_NEAREST);
 		break;
 		case 24:
-		texture.setMinFilter(GL_LINEAR_MIPMAP_NEAREST);
+		//texture.setMinFilter(GL_LINEAR_MIPMAP_NEAREST);
 		break;
 		case 25:
-		texture.setMinFilter(GL_NEAREST_MIPMAP_LINEAR);
+		//texture.setMinFilter(GL_NEAREST_MIPMAP_LINEAR);
 		break;
 		case 26:
-		texture.setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
+		//texture.setMinFilter(GL_LINEAR_MIPMAP_LINEAR);
 		break;
 
 		// END XXX
 
 		case 27:
-		texture.load("data/silhouette_narrow.ppm");
-		texture.generateTexture();
-		environmentMapping = true;
 		break;
 		case 28:
-		texture.load("data/silhouette_broad.ppm");
-		texture.generateTexture();
-		environmentMapping = true;
 		break;
 		default:
 		break;
@@ -676,7 +679,7 @@ void World::Raytrace() {
 	raytracer.SetSamplingRate(samplingRate);
 	raytracer.SetMatrices(cameraMatrix * modelMatrix, projection);
 	raytracer.SetRecursionDepth(recursionDepth);
-	traceTexture = raytracer.Raytrace(scene);
+	raytracer.Raytrace(scene);
 
 	float sec = timeGetTime() - t;
 

@@ -286,6 +286,10 @@ Image* Image::Loader::load(const Image::LoadDesc& desc) {
 		default: break;
 	}
 
+	if(image) {
+		image->generateTexture();
+	}
+
 	return image;
 }
 Image* Image::Loader::load(const std::string& filename) {
@@ -300,10 +304,6 @@ Image* Image::Loader::load(const std::string& filename) {
 		loadPPM(filename, image);
 	} else {
 		cerr << "file " << filename << " is not a PPM file" << endl;
-	}
-
-	if(image) {
-		image->generateTexture();
 	}
 
 	return image;

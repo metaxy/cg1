@@ -35,7 +35,7 @@ Scene::~Scene() {
 	}
 }
 
-void Scene::AddObject(std::string modelName, int mat,//std::string materialName,
+void Scene::AddObject(std::string modelName, std::string materialName,
 					  glm::mat4 modelMatrix) {
 	TriMesh* mesh = Resources::Get<TriMesh>(modelName);
 	assert(mesh);
@@ -83,7 +83,7 @@ void Scene::AddObject(std::string modelName, int mat,//std::string materialName,
 	SceneObject o;
 	o.mesh = mesh;
 	o.transformation = modelMatrix;
-	o.material = mat == 0 ? &material1 : &material2;
+	o.material = Resources::Get<Material>(materialName);//mat == 0 ? &material1 : &material2;
 
 	m_objects.push_back(o);
 }
@@ -160,11 +160,11 @@ void Scene::BindLights(GLSLShader& shader, const mat4& modelView)  {
 }
 
 void Scene::BuildScene(Scene& scene) {
-	scene.AddObject("quad", 1,
+	scene.AddObject("quad", "mat2",
 					glm::rotate(-radians(90.f), vec3(1, 0, 0)) * glm::scale(vec3(5.f, 5.f, 5.f)));
-	scene.AddObject("sphere", 0,
+	scene.AddObject("sphere", "mat1",
 					translate(vec3(0.f, 0.75f, 0.f)));
-	scene.AddObject("shuttle", 1,
+	scene.AddObject("shuttle", "mat2",
 					translate(vec3(2.5f, 0.75f, 1.f))* rotate(-glm::half_pi<float>(), vec3(1.f, 0.f, 0.f)));
 	/*scene.AddObject("shuttle", "",
 					translate(vec3(1.25f, 1.25f, 0.f)) * rotate(-glm::quarter_pi<float>(), vec3(0.f, 0.f, 1.f)) * rotate(-glm::half_pi<float>(), vec3(1.f, 0.f, 0.f)));*/
@@ -173,7 +173,7 @@ void Scene::BuildScene(Scene& scene) {
 	scene.AddLight(vec4(1.f, 2.f, 2.f, 1.f), 
 				   vec4(0.1f, 0.1f, 0.1f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f));
 	scene.AddLight(vec4(-3.f, 2.f, 1.5f, 1.f),
-				   vec4(0.f, 0.f, 0.f, 1.f), vec4(1.0f, 0.0f, 0.675f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f));
+				   vec4(0.f, 0.f, 0.f, 1.f), vec4(0.3f, 0.3f, 0.3f, 1.f), vec4(0.3f, .3f, 0.3f, 1.f));
 
 	// Print some scene info
 	cout << "[Scene]" << endl;

@@ -6,9 +6,7 @@
 template<class T>
 class PoolResource {
 public:
-	static void Add(T* pObject, std::string name) {
-		auto it = m_pool.find(name);
-		
+	static void Add(T* pObject, std::string name) {		
 		// Remove any existing resource
 		Remove(name);
 

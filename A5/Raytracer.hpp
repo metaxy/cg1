@@ -35,7 +35,7 @@ public:
 	Raytracer();
 	~Raytracer();
 
-	Image* Raytrace(Scene& scene);
+	void Raytrace(Scene& scene);
 
 	void RenderPoints(bool colored);
 
@@ -50,15 +50,13 @@ private:
 	void CreatePrimaryRays();
 
 	void BuildImage(float winX, float winY);
-	//private:
 public:
-	// Image information
-	std::vector<glm::vec4> m_data;
-	Image m_image;
-
 	// Raytracing information
 	std::vector<Ray> m_rays;
+	
+	std::vector<glm::vec4> m_data;
 	std::vector<glm::vec3> m_points;
+
 	WindowInfo m_winInfo;
 	int m_recursionDepth;
 };

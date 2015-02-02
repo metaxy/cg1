@@ -25,7 +25,7 @@ Raytracer::Raytracer()
 Raytracer::~Raytracer() {
 }
 
-Image* Raytracer::Raytrace(Scene& scene) {
+void Raytracer::Raytrace(Scene& scene) {
 	// Create the rays
 	CreatePrimaryRays();
 	assert(!m_rays.empty());
@@ -57,7 +57,7 @@ Image* Raytracer::Raytrace(Scene& scene) {
 	BuildImage(m_winInfo.raysX, m_winInfo.raysY);
 
 	// 
-	return &m_image;
+	//return Resources::Get<Image>("final_image");
 }
 
 void Raytracer::RenderPoints(bool colored) {
@@ -194,14 +194,12 @@ void Raytracer::CreatePrimaryRays() {
 
 void Raytracer::BuildImage(float winX, float winY) {
 	// TODO: Use the sample rate
-	/*Image::LoadDesc desc;
+	Image::LoadDesc desc;
 	desc.name = "final_image";
 	desc.mode = Image::LoadDesc::MEMORY;
 	desc.data = &m_data;
 	desc.size = vec2(winX, winY);
-	Resources::Load<Image>(desc);*/
-	m_image.load(m_data, winX, winY);
-	m_image.generateTexture();
+	Resources::Load<Image>(desc);
 }
 
 void Raytracer::SetWindowSize(float winX, float winY) {

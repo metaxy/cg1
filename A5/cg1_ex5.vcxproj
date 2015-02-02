@@ -88,7 +88,10 @@
     <None Include="meshes\lightcycle.off" />
     <None Include="meshes\lucy.off" />
     <None Include="meshes\mannequin.off" />
+    <None Include="meshes\mat1.mtl" />
+    <None Include="meshes\mat2.mtl" />
     <None Include="meshes\plane4x4.off" />
+    <None Include="meshes\plastic.mtl" />
     <None Include="meshes\quad.off" />
     <None Include="meshes\spaceshuttle.off" />
     <None Include="meshes\sphere.off" />

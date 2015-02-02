@@ -28,7 +28,7 @@ public:
 
 	static void BuildScene(Scene& scene);
 
-	void AddObject(std::string modelName, int mat,//std::string materialName,
+	void AddObject(std::string modelName, std::string materialName,
 				   glm::mat4 modelMatrix);
 	void AddLight(glm::vec4 position, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular);
 	//void AddLight();

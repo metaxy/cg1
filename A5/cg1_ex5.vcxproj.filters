@@ -215,6 +215,15 @@
     <None Include="meshes\torus_tri.off">
       <Filter>Meshes</Filter>
     </None>
+    <None Include="meshes\mat1.mtl">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\mat2.mtl">
+      <Filter>Meshes</Filter>
+    </None>
+    <None Include="meshes\plastic.mtl">
+      <Filter>Meshes</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\world.jpg">
