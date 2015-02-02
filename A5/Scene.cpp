@@ -20,7 +20,7 @@ using namespace std;
 
 const int MAX_LIGHTS = 5;
 static Material material1 = Material(vec4(0.7f, 0.1f, 0.1f, 1.f), vec4(0.7f, 0.1f, 0.1f, 1.f),
-									 vec4(1.f, 1.f, 1.f, 1.f), 50);
+									 vec4(1.f, 1.f, 1.f, 1.f), 170);
 static Material material2 = Material(vec4(0.3f, 0.3f, 0.3f, 1.f), vec4(0.3f, 0.3f, 0.3f, 1.f),
 									 vec4(0.2f, 0.2f, 0.2f, 0.2f), 50);
 
@@ -87,7 +87,7 @@ void Scene::AddObject(std::string modelName, int mat,//std::string materialName,
 
 	m_objects.push_back(o);
 }
-void Scene::AddLight(glm::vec4 position, glm::vec4 ambient, glm::vec4 diffuse) {
+void Scene::AddLight(glm::vec4 position, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular) {
 	if(m_lights.size() >= MAX_LIGHTS)
 		return;
 
@@ -95,6 +95,7 @@ void Scene::AddLight(glm::vec4 position, glm::vec4 ambient, glm::vec4 diffuse) {
 	l->position = position;
 	l->ambient = ambient;
 	l->diffuse = diffuse;
+	l->specular = specular;
 
 	m_lights.push_back(l);
 }
@@ -115,15 +116,14 @@ void Scene::RenderScene(GLSLShader& shader, const mat4& modelView, const mat4& p
 		shader.setUniform("showTexture", false);
 
 		// TODO: Apply the model view to the light sources
-		//shader.setUniform("lightSource[0].position", modelView * first->position);
-		//shader.setUniform("lightSource[0].ambient", first->ambient);
-		//shader.setUniform("lightSource[0].diffuse", first->diffuse);
-		//shader.setUniform("lightSource[0].specular", first->specular);
+		//shader.setUniform("cameraEye", )
 
 		BindLights(shader, modelView);
 
 		shader.setUniform("material.ambient", o.material->getAmbient());
 		shader.setUniform("material.diffuse", o.material->getDiffuse());
+		shader.setUniform("material.specular", o.material->getSpecular());
+		shader.setUniform("material.shininess", o.material->getShininess());
 
 		o.mesh->draw();
 	}
@@ -153,6 +153,7 @@ void Scene::BindLights(GLSLShader& shader, const mat4& modelView)  {
 		shader.setUniform(chunk + ".position", modelView * m_lights[i]->position);
 		shader.setUniform(chunk + ".ambient", m_lights[i]->ambient);
 		shader.setUniform(chunk + ".diffuse", m_lights[i]->diffuse);
+		shader.setUniform(chunk + ".specular", m_lights[i]->specular);
 	}
 
 	shader.setUniform("numLights", (float)m_lights.size());
@@ -170,9 +171,9 @@ void Scene::BuildScene(Scene& scene) {
 	/*scene.AddObject("auto", 0,
 					translate(vec3(0.f, 0.25f, 1.f)) * rotate(glm::quarter_pi<float>(), vec3(0.f, 1.f, 0.f)));*/
 	scene.AddLight(vec4(1.f, 2.f, 2.f, 1.f), 
-				   vec4(0.1f, 0.1f, 0.1f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f));
+				   vec4(0.1f, 0.1f, 0.1f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f), vec4(1.f, 1.0f, 1.0f, 1.f));
 	/*scene.AddLight(vec4(-3.f, 2.f, 1.5f, 1.f),
-				   vec4(0.0f, 0.0f, 0.0f, 1.f), vec4(0.1f, 0.6f, 0.1f, 1.f));*/
+				   vec4(0.0f, 0.0f, 0.0f, 1.f), vec4(0.1f, 0.1f, 0.1f, 1.f));*/
 
 	// Print some scene info
 	cout << "[Scene]" << endl;

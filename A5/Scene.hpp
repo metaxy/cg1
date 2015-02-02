@@ -30,7 +30,7 @@ public:
 
 	void AddObject(std::string modelName, int mat,//std::string materialName,
 				   glm::mat4 modelMatrix);
-	void AddLight(glm::vec4 position, glm::vec4 ambient, glm::vec4 diffuse);
+	void AddLight(glm::vec4 position, glm::vec4 ambient, glm::vec4 diffuse, glm::vec4 specular);
 	//void AddLight();
 	void BuildKDTree();
 	bool Hit(const Ray& r, Ray::HitInfo& rh);

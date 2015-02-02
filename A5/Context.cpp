@@ -29,7 +29,7 @@ static const uvec2 position = uvec2(100, 100);
 static const int GAP = 3;
 
 // window title
-static const string title = "cg1 assignment 4 - texturing";
+static const string title = "cg1 assignment 5 - raytracing";
 
 // windows
 static Window mainWindow, textureWindow, worldWindow;

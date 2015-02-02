@@ -70,7 +70,7 @@ void Raytracer::RenderPoints(bool colored) {
 				glm::vec4 color = m_data[y * m_winInfo.raysX + x];
 				glColor3f(color.x, color.y, color.z);
 			}
-			
+
 			glm::vec3 point = m_points[y * m_winInfo.raysX + x];
 			glVertex3f(point.x, point.y, point.z);
 		}
@@ -82,7 +82,7 @@ void Raytracer::RenderPoints(bool colored) {
 		}
 
 		glVertex3f(p.x, p.y, p.z);
-	}*/
+		}*/
 	glEnd();
 	glPopMatrix();
 }
@@ -119,17 +119,22 @@ glm::vec4 Raytracer::CastRay(Scene& scene, const Ray& r, Ray::HitInfo& info, int
 			for(int lightID = 0; lightID < lights.size(); ++lightID) {
 				Light* currentLight = scene.m_lights[lightID];
 
-				auto light = currentLight->BlinnPhong(vec4(primaryPoint, 1),
-													  inormal, currentMat);
+				auto light = currentLight->BlinnPhong(
+					glm::vec4(r.origin(), 1.f),
+					vec4(primaryPoint, 1),
+					inormal, currentMat
+					);
+
+
 				// Shadow ray
 				glm::vec3 point = primaryPoint + inormal * 0.001f;
 				//glm::vec3 toLight = glm::normalize(glm::vec3(glm::inverse(m_winInfo.modelView) * World::lightSource.position) - point);
 				glm::vec3 toLight = glm::vec3(currentLight->position) - point;
 				Ray sr(point, glm::normalize(toLight));
 
-				Ray::HitInfo lightSensorHit;
 
 				glm::vec4 partColor;
+				Ray::HitInfo lightSensorHit;
 				if(scene.Hit(sr, lightSensorHit)) {
 					partColor =
 						currentMat->getAmbient() *
