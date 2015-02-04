@@ -269,8 +269,8 @@ void Common::keyPressed(unsigned char key, int x, int y) {
 // TEXTURE WINDOW
 // -------------------------------------------------------
 
-int Texture::menuOptions[] = {0, 17, 18, 0, 1, 2, 3, 4, 5, 0, 6, 7, 8, 9, 10, 11, 0, 12, 13, 14, 15, 16, 0, 19, 20, 21, 22, 23, 24, 25, 26, 0, 27, 28};
-string Texture::menuText[] = {"TOOLS:", "    Pen", "    Eraser",
+int Texture::menuOptions[] = {0, 127, 17, 18, 0, 1, 2, 3, 4, 5, 0, 6, 7, 8, 9, 10, 11, 0, 12, 13, 14, 15, 16, 0, 19, 20, 21, 22, 23, 24, 25, 26, 0, 27, 28};
+string Texture::menuText[] = {"TOOLS:", "    Save", "    Pen", "    Eraser",
 "SPHERICAL TEXTURES:", "    Earth", "    Earth (ice)", "    Earth (night)", "    Saturn", "    Marble",
 "ENVIRONMENT TEXTURES:", "    St Peters dome", "    Uffizium", "    Supernova", "    Landscape", "    Forest", "    Phong Light",
 "MISC TEXTURES", "    Checkerboard", "    Grid1", "    Grid2", "    Spectrum", "    Nemo",
@@ -417,6 +417,9 @@ void Texture::menu(int value) {
 		break;
 		case 28:
 		break;
+        case 127:
+        Resources::Get<Image>("final_image")->writePPM("result.ppm");
+        break;
 		default:
 		break;
 	}

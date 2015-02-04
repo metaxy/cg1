@@ -271,3 +271,25 @@ void Image::loadPPM(const std::string& filename) {
 
 	std::cout << "Image " << filename << " loaded. width=" << width << " height=" << height << endl;
 }
+
+
+
+void Image::writePPM(const std::string& filename) {
+
+	fstream file(filename.c_str(),  ios::in);
+
+	if(!file.is_open()) {
+		cerr << "opening file " << filename << " failed" << endl;
+		return;
+	}
+    file << "P3" << std::endl;
+    file << width << " " << height << std::endl;
+   	for(int y = height-1; y >= 0; y--) {
+		for(int x = 0; x < width; x++) {
+            vec4 p = getPixel(x,y)*255;
+	        file << (int)p.x << " " << (int)p.y << " " << (int)p.z << "  ";
+        }
+        file << std::endl;
+    }
+    file.close();
+}
