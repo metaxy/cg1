@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/ml/win32
+END
+glut.h
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/ml/win32/glut.h
+END
+glut32.lib
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/ml/win32/glut32.lib
+END
+glew32.lib
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/cg1/!svn/ver/139/trunk/ex/cg1_ex3/ml/win32/glew32.lib
+END
+glut.def
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/ml/win32/glut.def
+END
+glut32.dll
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/ml/win32/glut32.dll
+END
+README-win32.txt
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/ml/win32/README-win32.txt
+END
+AntTweakBar.dll
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/ml/win32/AntTweakBar.dll
+END
+glew32.dll
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/cg1/!svn/ver/139/trunk/ex/cg1_ex3/ml/win32/glew32.dll
+END

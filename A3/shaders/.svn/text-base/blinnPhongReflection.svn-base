@@ -1,0 +1,50 @@
+#version 150
+
+struct LightSource{
+  //position in view space
+  vec4 position;
+  // ambient color
+  vec4 ambient;
+  // diffuse color
+  vec4 diffuse;
+  // specular color
+  vec4 specular;
+};
+
+struct Material{
+  // ambient color
+  vec4 ambient;
+  // diffuse color
+  vec4 diffuse;
+  // specular color
+  vec4 specular;
+  // shininess
+  float shininess;
+};
+
+uniform struct LightSource lightSource;
+uniform struct Material material;
+
+// position and normal in view space
+vec4 blinnPhongReflection(vec4 position, vec3 normal){
+	
+  // compute the normal, light direction and half vector
+  vec3 lightDirection= normalize(lightSource.position.xyz-position.xyz);
+  // compute half vector
+  // we are in eye coordinates, so eye position is (0,0,0) 
+  vec3 halfVector= normalize(lightDirection - position.xyz);
+  
+  // ambient lighting
+  vec4 ambient= lightSource.ambient*material.ambient;
+  
+  // compute brdf value f = cd + cs * hDotN^m  
+  float nDotH = max(dot(normal, halfVector),0.0);
+  vec4 specular = material.specular*lightSource.specular*pow(material.shininess, nDotH);
+  
+  // multiply by light intensity * cosine weight
+  float nDotL = max(dot(normal,lightDirection),0.0);
+  return ambient + nDotL*lightSource.diffuse*(material.diffuse+specular);
+
+  //return vec4(vec3(material.shininess), 1);
+}
+	

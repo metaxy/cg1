@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="GLSLShader.cpp" />
+    <ClCompile Include="TriMesh.cpp" />
+    <ClCompile Include="Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Context.hpp" />
+    <ClInclude Include="Image.hpp" />
+    <ClInclude Include="Texture.hpp" />
+    <ClInclude Include="GLSLShader.hpp" />
+    <ClInclude Include="TriMesh.hpp" />
+    <ClInclude Include="Window.hpp" />
+    <ClInclude Include="Light.hpp" />
+    <ClInclude Include="Material.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{b2242fd1-669a-4e17-8e68-a39be8549ac2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\blinnPhongReflection">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\flatQuad.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\flatQuad.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\quad.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\quad.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\texturing.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\texturing.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\sphereMap.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shaders\sphereMap.vert">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

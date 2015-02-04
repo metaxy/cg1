@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL
+END
+glut.h
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/glut.h
+END
+freeglut.lib
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/freeglut.lib
+END
+freeglut.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/freeglut.h
+END
+freeglut_ext.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/freeglut_ext.h
+END
+glew.h
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/glew.h
+END
+glew32.lib
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/glew32.lib
+END
+wglew.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/wglew.h
+END
+glxew.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/glxew.h
+END
+freeglut_std.h
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/cg1/!svn/ver/40/tags/wise-2013/ex/cg1_ex4/ml/win32/GL/freeglut_std.h
+END

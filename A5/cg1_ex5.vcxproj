@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BoundingBox.cpp" />
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="GLSLShader.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="KDTree.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="Raytracer.cpp" />
+    <ClCompile Include="Resources.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Triangle.cpp" />
+    <ClCompile Include="TriMesh.cpp" />
+    <ClCompile Include="Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BoundingBox.hpp" />
+    <ClInclude Include="Context.hpp" />
+    <ClInclude Include="GLSLShader.hpp" />
+    <ClInclude Include="Image.hpp" />
+    <ClInclude Include="Intersector.hpp" />
+    <ClInclude Include="KDTree.hpp" />
+    <ClInclude Include="Light.hpp" />
+    <ClInclude Include="PoolResource.hpp" />
+    <ClInclude Include="Material.hpp" />
+    <ClInclude Include="Ray.hpp" />
+    <ClInclude Include="Raytracer.hpp" />
+    <ClInclude Include="Resources.hpp" />
+    <ClInclude Include="Scene.hpp" />
+    <ClInclude Include="Texture.hpp" />
+    <ClInclude Include="Triangle.hpp" />
+    <ClInclude Include="TriMesh.hpp" />
+    <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="Window.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\checker.ppm" />
+    <None Include="data\checker2.ppm" />
+    <None Include="data\checker3.ppm" />
+    <None Include="data\checker4.ppm" />
+    <None Include="data\checker5.ppm" />
+    <None Include="data\earth2.ppm" />
+    <None Include="data\earthbump1k.ppm" />
+    <None Include="data\earthbump1k_2.ppm" />
+    <None Include="data\earthcyl2.ppm" />
+    <None Include="data\earthlights.ppm" />
+    <None Include="data\fine.ppm" />
+    <None Include="data\flowers.ppm" />
+    <None Include="data\grid.ppm" />
+    <None Include="data\grid_normals.ppm" />
+    <None Include="data\lines.ppm" />
+    <None Include="data\marble.ppm" />
+    <None Include="data\saturncyl1.ppm" />
+    <None Include="data\supernova.ppm" />
+    <None Include="data\waterbump.ppm" />
+    <None Include="data\wood.ppm" />
+    <None Include="data\world.ppm" />
+    <None Include="data\worldbump.ppm" />
+    <None Include="data\worldspec.ppm" />
+    <None Include="meshes\auto.off" />
+    <None Include="meshes\bialetti.off" />
+    <None Include="meshes\bunny.off" />
+    <None Include="meshes\bunnysimple.off" />
+    <None Include="meshes\camel_head.off" />
+    <None Include="meshes\cow.off" />
+    <None Include="meshes\dice.mtl" />
+    <None Include="meshes\dice.off" />
+    <None Include="meshes\dragon.off" />
+    <None Include="meshes\drei.off" />
+    <None Include="meshes\eight.off" />
+    <None Include="meshes\europemap.off" />
+    <None Include="meshes\hand.off" />
+    <None Include="meshes\heptoroid.off" />
+    <None Include="meshes\homer.off" />
+    <None Include="meshes\killeroo.off" />
+    <None Include="meshes\lightcycle.off" />
+    <None Include="meshes\lucy.off" />
+    <None Include="meshes\mannequin.off" />
+    <None Include="meshes\mat1.mtl" />
+    <None Include="meshes\mat2.mtl" />
+    <None Include="meshes\plane4x4.off" />
+    <None Include="meshes\plastic.mtl" />
+    <None Include="meshes\quad.off" />
+    <None Include="meshes\spaceshuttle.off" />
+    <None Include="meshes\sphere.off" />
+    <None Include="meshes\sphere_2.off" />
+    <None Include="meshes\tasse.off" />
+    <None Include="meshes\teapot.off" />
+    <None Include="meshes\tempel.off" />
+    <None Include="meshes\torus_tri.off" />
+    <None Include="shaders\blinnPhongReflection" />
+    <None Include="shaders\flatQuad.frag" />
+    <None Include="shaders\flatQuad.vert" />
+    <None Include="shaders\texturing.frag" />
+    <None Include="shaders\texturing.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="data\world.jpg" />
+    <Image Include="data\worldspec.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="meshes\dice.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="meshes\lightcycle.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="meshes\quad.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>cg1_ex5</ProjectName>
+    <ProjectGuid>{F0163C31-ECC0-492A-9406-90F7CA6BD84B}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjDir)glm;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjDir)win32;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir);glm-0.9.4.1;./win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <BrowseInformation>true</BrowseInformation>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>./win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut.lib;glew32.lib;%(AdditionalDependencies);Winmm.lib</AdditionalDependencies>
+    </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./win32/include;./inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(ProjDir)win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glew32.lib;freeglut.lib;%(AdditionalDependencies);Winmm.lib</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

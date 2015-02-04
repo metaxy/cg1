@@ -292,7 +292,6 @@ void Node::drawBoundingSphere() {
 
 // increment / decrement rotation
 void Node::rotate(float x, float y, float z) {
-
 	rotx += x;
 	roty += y;
 	rotz += z;

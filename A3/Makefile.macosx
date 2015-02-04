@@ -1,0 +1,17 @@
+EXECUTABLE= cg1_ex3_mac
+CC= g++
+CPPFLAGS= -O3 -DMACOSX -Iglm/ -Iinclude
+DEPS= glm/glm.hpp glm/gtc/matrix_transform.hpp Window.hpp Context.hpp GLSLShader.hpp TriMesh.hpp
+OBJ= Window.o Context.o  GLSLShader.o TriMesh.o Shading.o
+LIBS= -framework GLUT -framework OpenGL -lglew
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+$(EXECUTABLE): $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm -f *.o *~ $(EXECUTABLE)

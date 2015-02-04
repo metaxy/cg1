@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/skeleton/shaders
+END
+PassThrough.frag
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/skeleton/shaders/PassThrough.frag
+END
+PassThrough.vert
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/skeleton/shaders/PassThrough.vert
+END
+BlinnPhong.frag
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/skeleton/shaders/BlinnPhong.frag
+END
+BlinnPhong.vert
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/cg1/!svn/ver/38/trunk/ex/cg1_ex3/skeleton/shaders/BlinnPhong.vert
+END
